@@ -1820,3 +1820,16 @@ icon = "route"
 description = "Monitor Codex 5-hour and weekly quotas for every OmniRoute account."
 plugin_api = 22
 tags = ["ai", "bar", "panel", "service", "indicator", "utility"]
+
+[[plugin]]
+id = "h-jangra/keyviz"
+name = "Key Visualizer"
+version = "0.1.0"
+updated_at = 1787885483
+added_at = 1787885483
+author = "h-jangra"
+license = "MIT"
+icon = "keyboard"
+description = "Real-time floating on-screen keystroke visualizer for Noctalia."
+plugin_api = 13
+tags = ["utility", "bar", "service", "shortcut", "panel"]
