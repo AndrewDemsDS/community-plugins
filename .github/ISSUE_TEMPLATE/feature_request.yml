@@ -78,6 +78,7 @@ body:
         - k8s-status
         - keybind-cheatsheet
         - keymap
+        - keyviz
         - kineticwe-layouts
         - lid-guard
         - link-ip-monitor
