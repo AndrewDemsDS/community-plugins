@@ -1924,3 +1924,16 @@ icon = "adjustments-horizontal"
 description = "Visually edit Hyprland animations, borders and shaders from a Noctalia panel."
 plugin_api = 3
 tags = ["hyprland", "animation", "theming", "panel", "bar"]
+
+[[plugin]]
+id = "mellotanica/launcher-pass"
+name = "Launcher pass"
+version = "2.0.0"
+updated_at = 1788118014
+added_at = 1788118014
+author = "Marco Melletti"
+license = "MIT"
+icon = "lock"
+description = "Noctalia launcher provider for the GNU Pass password store with autotype and advanced search"
+plugin_api = 26
+tags = ["launcher", "privacy", "productivity", "utility"]
