@@ -1911,3 +1911,16 @@ icon = "world-plus"
 description = "Turn websites into desktop apps: a launcher entry with the site's icon, opening in its own browser app window."
 plugin_api = 9
 tags = ["panel", "utility"]
+
+[[plugin]]
+id = "linux-fertxo/hyprland-visual-editor"
+name = "Hyprland Visual Editor"
+version = "2.0.0"
+updated_at = 1788117624
+added_at = 1788117624
+author = "XimoCP (v4 original) + Hermy & linux-fertxo (v5 Luau port)"
+license = "MIT"
+icon = "adjustments-horizontal"
+description = "Visually edit Hyprland animations, borders and shaders from a Noctalia panel."
+plugin_api = 3
+tags = ["hyprland", "animation", "theming", "panel", "bar"]
