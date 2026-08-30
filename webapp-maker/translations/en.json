@@ -19,8 +19,8 @@
   "ok_removed": "\"{name}\" removed",
   "settings": {
     "env_file": {
-      "label": "Environment file",
-      "description": "Sourced before the install and launch commands — e.g. a file exporting HTTPS_PROXY so site icons download through a proxy. Empty = none."
+      "description": "Sourced before the install and launch commands — e.g. a file exporting HTTPS_PROXY so site icons download through a proxy. Empty = none.",
+      "label": "Environment file"
     }
   },
   "status_busy": "Creating — fetching the icon…",

@@ -22,8 +22,6 @@
     "fan_speed": "Ventilateur {fan} : {rpm} tr/min",
     "fan_speed_temp": "Ventilateur {fan} : {rpm} tr/min · {temp}",
     "max_temp": "Température maximale : {temp}°C",
-    "temp_board": "Carte {temp}°C",
-    "temp_cpu": "CPU {temp}°C",
     "mode": {
       "auto": "BIOS",
       "auto_help": "Le contrôleur embarqué gère les vitesses des ventilateurs. Aucune écriture n'est envoyée par le plugin.",
@@ -46,7 +44,9 @@
       "unavailable_message": "Installez asus-fan-control-ec et configurez sudo sans mot de passe.",
       "unavailable_title": "Indisponible"
     },
-    "sync_fans": "Synchroniser les vitesses"
+    "sync_fans": "Synchroniser les vitesses",
+    "temp_board": "Carte {temp}°C",
+    "temp_cpu": "CPU {temp}°C"
   },
   "settings": {
     "poll_interval": {

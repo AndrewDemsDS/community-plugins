@@ -46,6 +46,10 @@
       "description": "Enable the Flatpak adapter for managing system updates.",
       "label": "Enable Flatpak adapter"
     },
+    "enable_gearlever": {
+      "description": "Enable the Gear Lever adapter for managing AppImage updates.",
+      "label": "Enable Gear Lever adapter"
+    },
     "enable_packagekit": {
       "description": "Enable the PackageKit adapter for managing system updates.",
       "label": "Enable PackageKit adapter"
@@ -53,10 +57,6 @@
     "enable_pipx": {
       "description": "Enable the pipx adapter for managing Python application updates.",
       "label": "Enable pipx adapter"
-    },
-    "enable_gearlever": {
-      "description": "Enable the Gear Lever adapter for managing AppImage updates.",
-      "label": "Enable Gear Lever adapter"
     },
     "enable_xbps": {
       "description": "Enable the XBPS adapter for managing system updates.",

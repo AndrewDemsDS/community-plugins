@@ -22,8 +22,6 @@
     "fan_speed": "Fan {fan}: {rpm}",
     "fan_speed_temp": "Fan {fan}: {rpm} · {temp}",
     "max_temp": "Peak temperature: {temp}°C",
-    "temp_board": "Board {temp}°C",
-    "temp_cpu": "CPU {temp}°C",
     "mode": {
       "auto": "BIOS",
       "auto_help": "The embedded controller manages fan speeds. No plugin writes are sent.",
@@ -46,7 +44,9 @@
       "unavailable_message": "Install asus-fan-control-ec and configure passwordless sudo.",
       "unavailable_title": "Unavailable"
     },
-    "sync_fans": "Synchronize fan speeds"
+    "sync_fans": "Synchronize fan speeds",
+    "temp_board": "Board {temp}°C",
+    "temp_cpu": "CPU {temp}°C"
   },
   "settings": {
     "poll_interval": {
