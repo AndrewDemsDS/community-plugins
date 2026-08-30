@@ -1995,3 +1995,16 @@ icon = "brand-spotify"
 description = "Search and play Spotify tracks with cached album artwork."
 plugin_api = 3
 tags = ["launcher", "media", "music"]
+
+[[plugin]]
+id = "cleboost/librelinkup"
+name = "LibreLinkUp"
+version = "1.0.0"
+updated_at = 1788121859
+added_at = 1788121859
+author = "Cleboost"
+license = "MIT"
+icon = "droplet"
+description = "Display your LibreLinkUp blood glucose on the bar with trend arrow."
+plugin_api = 9
+tags = ["bar", "service", "utility", "indicator"]
