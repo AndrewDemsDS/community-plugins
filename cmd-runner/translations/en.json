@@ -1,0 +1,46 @@
+{
+  "title": "Command Runner",
+  "widget": {
+    "label": "Commands",
+    "tooltip": "Command Runner - Run CLI commands in background"
+  },
+  "panel": {
+    "title": "Command Runner",
+    "subtitle": "Execute commands silently in background at a click",
+    "add_button": "New Command",
+    "cancel_button": "Cancel",
+    "save_button": "Save",
+    "run_button": "Run",
+    "running": "Running...",
+    "logs": "Log",
+    "delete": "Delete",
+    "edit": "Edit",
+    "name_label": "Command Name",
+    "name_placeholder": "e.g. System Update",
+    "cmd_label": "CLI Command",
+    "cmd_placeholder": "e.g. apt update && apt upgrade -y",
+    "sudo_label": "Requires Sudo (root)",
+    "sudo_enabled": "[✓] Requires sudo (root)",
+    "sudo_disabled": "[  ] Requires sudo (root)",
+    "sudo_pass_label": "Sudo Password (entered once)",
+    "sudo_pass_placeholder": "Sudo password...",
+    "sudo_pass_placeholder_saved": "Password saved (leave blank to keep)",
+    "no_commands": "No commands saved.",
+    "status_success": "✓ Status: Success (Code 0)",
+    "status_failed": "✗ Status: Failed (Code {code})"
+  },
+  "settings": {
+    "show_toast": {
+      "label": "Show notifications",
+      "description": "Shows a toast notice upon command completion or error"
+    },
+    "show_label": {
+      "label": "Show text label in bar",
+      "description": "Displays 'Commands' next to the icon in the top bar"
+    }
+  },
+  "notify": {
+    "success": "Command '{name}' completed successfully.",
+    "error": "Command '{name}' failed (Exit Code {code})."
+  }
+}
