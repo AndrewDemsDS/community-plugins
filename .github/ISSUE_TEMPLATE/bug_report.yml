@@ -74,6 +74,7 @@ body:
         - hypr-layout-switcher
         - hypr-screen-mirror
         - hypr-submap
+        - hyprland-visual-editor
         - ideapad-conservation-mode
         - iio_lock
         - imagemagick-clock
