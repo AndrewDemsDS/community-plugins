@@ -87,6 +87,7 @@ body:
         - kineticwe-layouts
         - launcher-pass
         - layout-fix
+        - librelinkup
         - lid-guard
         - link-ip-monitor
         - llamanager
