@@ -1898,3 +1898,16 @@ icon = "keyboard"
 description = "Fixes text typed in the wrong keyboard layout and switches the layout, Punto-style. Runs quietly in the background."
 plugin_api = 9
 tags = ["system", "utility", "niri"]
+
+[[plugin]]
+id = "umedbazarov/webapp-maker"
+name = "Webapp Maker"
+version = "1.0.0"
+updated_at = 1788117167
+added_at = 1788117167
+author = "umedbazarov"
+license = "MIT"
+icon = "world-plus"
+description = "Turn websites into desktop apps: a launcher entry with the site's icon, opening in its own browser app window."
+plugin_api = 9
+tags = ["panel", "utility"]
