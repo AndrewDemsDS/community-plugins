@@ -32,6 +32,7 @@ body:
         - anilist
         - arch-updater
         - asus-fan
+        - asus-fans-controller-ec
         - audio-switcher
         - battery-graph
         - battery-power-management
