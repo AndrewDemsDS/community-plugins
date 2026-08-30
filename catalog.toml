@@ -1661,8 +1661,8 @@ tags = ["panel", "system"]
 [[plugin]]
 id = "wy3z/opencodex-bar"
 name = "OpenCodexBar"
-version = "1.0.0"
-updated_at = 1787609125
+version = "1.0.1"
+updated_at = 1788111346
 added_at = 1787609125
 author = "wy3z"
 license = "MIT"
