@@ -41,6 +41,7 @@ body:
         - better-clock
         - bookmarks
         - calculator
+        - case-convert
         - cat
         - cider
         - claude-companion
