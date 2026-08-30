@@ -1859,3 +1859,16 @@ icon = "bug"
 description = "systemd-coredump crash history: desktop notifications, per-program mutes and one-click AI diagnosis in a terminal."
 plugin_api = 9
 tags = ["panel", "utility"]
+
+[[plugin]]
+id = "cleboost/asus-fans-controller-ec"
+name = "Asus Fans Controler EC"
+version = "1.0.0"
+updated_at = 1788115197
+added_at = 1788115197
+author = "Cleboost"
+license = "MIT"
+icon = "car-fan"
+description = "Control ASUS laptop fans via the embedded controller: speeds, sync, and BIOS handoff."
+plugin_api = 9
+tags = ["hardware", "bar", "panel", "service", "system", "indicator"]
