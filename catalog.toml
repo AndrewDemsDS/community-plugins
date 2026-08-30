@@ -1885,3 +1885,16 @@ icon = "terminal"
 description = "Save and execute CLI commands silently in the background with a one-time sudo password cache."
 plugin_api = 9
 tags = ["bar", "panel", "service", "utility", "system"]
+
+[[plugin]]
+id = "umedbazarov/layout-fix"
+name = "Layout Fix"
+version = "1.0.0"
+updated_at = 1788116003
+added_at = 1788116003
+author = "umedbazarov"
+license = "MIT"
+icon = "keyboard"
+description = "Fixes text typed in the wrong keyboard layout and switches the layout, Punto-style. Runs quietly in the background."
+plugin_api = 9
+tags = ["system", "utility", "niri"]
