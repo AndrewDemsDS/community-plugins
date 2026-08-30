@@ -1389,8 +1389,8 @@ tags = ["bar", "hardware"]
 [[plugin]]
 id = "mdj2812/mihomo-control"
 name = "Mihomo Control"
-version = "0.1.3"
-updated_at = 1787487818
+version = "0.1.4"
+updated_at = 1788111461
 added_at = 1786541657
 author = "mdj2812"
 license = "MIT"
@@ -1661,8 +1661,8 @@ tags = ["panel", "system"]
 [[plugin]]
 id = "wy3z/opencodex-bar"
 name = "OpenCodexBar"
-version = "1.0.0"
-updated_at = 1787609125
+version = "1.0.1"
+updated_at = 1788111346
 added_at = 1787609125
 author = "wy3z"
 license = "MIT"
