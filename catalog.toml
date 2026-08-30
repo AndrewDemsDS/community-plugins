@@ -1648,15 +1648,21 @@ tags = ["hardware", "bar", "system", "indicator"]
 [[plugin]]
 id = "tordex/nvtop"
 name = "NVTOP"
-version = "1.0.0"
-updated_at = 1787608918
+version = "2.0.0"
+updated_at = 1788119564
 added_at = 1787608918
 author = "tordex"
 license = "MIT"
 icon = "cpu"
 description = "Monitor real-time information about your GPU status and running processes with nvtop."
-plugin_api = 20
+plugin_api = 24
 tags = ["panel", "system"]
+
+[[plugin.release]]
+plugin_api = 20
+version = "1.0.0"
+updated_at = 1787608918
+rev = "f01631bd804b9b80fd00409ed3d5c7eb08bbde6f"
 
 [[plugin]]
 id = "wy3z/opencodex-bar"
