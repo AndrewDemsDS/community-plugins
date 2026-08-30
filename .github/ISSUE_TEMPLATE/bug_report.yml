@@ -84,6 +84,7 @@ body:
         - keymap
         - keyviz
         - kineticwe-layouts
+        - layout-fix
         - lid-guard
         - link-ip-monitor
         - llamanager
