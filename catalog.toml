@@ -1454,13 +1454,13 @@ tags = ["bar", "shortcut", "wallpaper"]
 [[plugin]]
 id = "raycursive/niri-displays"
 name = "Niri Displays"
-version = "0.3.0"
-updated_at = 1786903345
+version = "0.4.0"
+updated_at = 1788119053
 added_at = 1786903345
 author = "raycursive"
 license = "MIT"
 icon = "device-desktop"
-description = "Inspect connected Niri outputs and temporarily adjust resolution, refresh rate, and scale."
+description = "Inspect connected Niri outputs and temporarily adjust resolution, refresh rate, scale, rotation, and position."
 plugin_api = 9
 tags = ["bar", "niri", "panel", "service", "system", "utility"]
 
