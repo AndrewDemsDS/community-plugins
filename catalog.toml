@@ -1969,3 +1969,16 @@ icon = "world"
 description = "Open favourite websites or search Google from the Noctalia launcher."
 plugin_api = 18
 tags = ["launcher", "network", "utility"]
+
+[[plugin]]
+id = "notfinaldev/youtube-search"
+name = "YouTube Search"
+version = "1.0.0"
+updated_at = 1788121439
+added_at = 1788121439
+author = "notfinaldev"
+license = "MIT"
+icon = "brand-youtube"
+description = "Search YouTube and open videos from the Noctalia launcher."
+plugin_api = 18
+tags = ["launcher", "media", "network", "video"]
