@@ -1943,3 +1943,16 @@ icon = "lock"
 description = "Noctalia launcher provider for the GNU Pass password store with autotype and advanced search"
 plugin_api = 26
 tags = ["launcher", "privacy", "productivity", "utility"]
+
+[[plugin]]
+id = "levi/warp"
+name = "Cloudflare WARP"
+version = "1.2.0"
+updated_at = 1788120574
+added_at = 1788120574
+author = "Levi"
+license = "MIT"
+icon = "cloud-lock"
+description = "Toggle Cloudflare WARP from the bar or Control Center."
+plugin_api = 3
+tags = ["bar", "indicator", "network", "privacy", "shortcut"]
