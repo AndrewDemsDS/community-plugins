@@ -1846,3 +1846,16 @@ icon = "text-recognition"
 description = "Convert text between naming conventions (camelCase, kebab-case, snake_case, …) straight from the launcher."
 plugin_api = 3
 tags = ["launcher", "utility", "development"]
+
+[[plugin]]
+id = "umedbazarov/crashes"
+name = "Crashes"
+version = "1.0.0"
+updated_at = 1788115004
+added_at = 1788115004
+author = "umedbazarov"
+license = "MIT"
+icon = "bug"
+description = "systemd-coredump crash history: desktop notifications, per-program mutes and one-click AI diagnosis in a terminal."
+plugin_api = 9
+tags = ["panel", "utility"]
