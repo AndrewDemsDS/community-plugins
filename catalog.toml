@@ -1982,3 +1982,16 @@ icon = "brand-youtube"
 description = "Search YouTube and open videos from the Noctalia launcher."
 plugin_api = 18
 tags = ["launcher", "media", "network", "video"]
+
+[[plugin]]
+id = "notfinaldev/spotify"
+name = "Spotify Search"
+version = "1.0.0"
+updated_at = 1788121577
+added_at = 1788121577
+author = "notfinaldev"
+license = "MIT"
+icon = "brand-spotify"
+description = "Search and play Spotify tracks with cached album artwork."
+plugin_api = 3
+tags = ["launcher", "media", "music"]
