@@ -1872,3 +1872,16 @@ icon = "car-fan"
 description = "Control ASUS laptop fans via the embedded controller: speeds, sync, and BIOS handoff."
 plugin_api = 9
 tags = ["hardware", "bar", "panel", "service", "system", "indicator"]
+
+[[plugin]]
+id = "nocode-96/cmd-runner"
+name = "Command Runner"
+version = "1.0.0"
+updated_at = 1788115775
+added_at = 1788115775
+author = "Noah B."
+license = "MIT"
+icon = "terminal"
+description = "Save and execute CLI commands silently in the background with a one-time sudo password cache."
+plugin_api = 9
+tags = ["bar", "panel", "service", "utility", "system"]
