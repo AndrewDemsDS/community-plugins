@@ -131,6 +131,7 @@ body:
         - shell-command
         - shelly
         - special-workspaces
+        - spotify
         - spotify-lyrics
         - spotify-media
         - ssh-launcher
