@@ -1956,3 +1956,16 @@ icon = "cloud-lock"
 description = "Toggle Cloudflare WARP from the bar or Control Center."
 plugin_api = 3
 tags = ["bar", "indicator", "network", "privacy", "shortcut"]
+
+[[plugin]]
+id = "notfinaldev/web-search"
+name = "Web Search"
+version = "1.3.0"
+updated_at = 1788121066
+added_at = 1788121066
+author = "notfinaldev"
+license = "MIT"
+icon = "world"
+description = "Open favourite websites or search Google from the Noctalia launcher."
+plugin_api = 18
+tags = ["launcher", "network", "utility"]
