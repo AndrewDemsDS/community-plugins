@@ -46,6 +46,7 @@ body:
         - cat
         - cider
         - claude-companion
+        - cmd-runner
         - codexbar-meter
         - color_picker
         - config-swap
