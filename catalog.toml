@@ -780,8 +780,8 @@ tags = ["network", "bar", "panel", "service", "shortcut", "utility", "system", "
 [[plugin]]
 id = "yuuto/arch-updater"
 name = "Arch Updater"
-version = "2.0.1"
-updated_at = 1787608732
+version = "2.0.2"
+updated_at = 1788120265
 added_at = 1785208995
 author = "yuuto"
 license = "MIT"
@@ -1150,15 +1150,15 @@ tags = ["bar", "hardware", "panel", "service", "system", "utility"]
 [[plugin]]
 id = "goatnath/spotify-lyrics"
 name = "Spotify Lyrics"
-version = "1.2.0"
-updated_at = 1786025122
+version = "1.2.1"
+updated_at = 1788120249
 added_at = 1786025122
 author = "goatnath"
 license = "MIT"
 icon = "music"
 description = "Time-synced lyrics panel linked to the media widget."
 plugin_api = 3
-tags = ["music"]
+tags = ["music", "bar", "panel", "desktop", "service"]
 
 [[plugin]]
 id = "tadomika_ari/config-swap"
@@ -1525,8 +1525,8 @@ tags = ["bar", "panel", "service", "system"]
 [[plugin]]
 id = "tphilippot/git_companion"
 name = "Git Companion"
-version = "1.0.0"
-updated_at = 1786925440
+version = "1.1.0"
+updated_at = 1788120279
 added_at = 1786925440
 author = "thomas-philippot"
 license = "MIT"
