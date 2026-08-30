@@ -48,6 +48,7 @@ body:
         - codexbar-meter
         - color_picker
         - config-swap
+        - crashes
         - custom-shortcut
         - daily-wallpaper
         - deepseek_usage
