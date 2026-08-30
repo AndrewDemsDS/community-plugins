@@ -1895,8 +1895,8 @@ tags = ["bar", "panel", "service", "utility", "system"]
 [[plugin]]
 id = "umedbazarov/layout-fix"
 name = "Layout Fix"
-version = "1.0.0"
-updated_at = 1788116003
+version = "1.0.1"
+updated_at = 1788121718
 added_at = 1788116003
 author = "umedbazarov"
 license = "MIT"
