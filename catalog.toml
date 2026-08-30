@@ -1833,3 +1833,16 @@ icon = "keyboard"
 description = "Real-time floating on-screen keystroke visualizer for Noctalia."
 plugin_api = 13
 tags = ["utility", "bar", "service", "shortcut", "panel"]
+
+[[plugin]]
+id = "kjvdven/case-convert"
+name = "Case Convert"
+version = "1.0.0"
+updated_at = 1788114941
+added_at = 1788114941
+author = "kjvdven"
+license = "MIT"
+icon = "text-recognition"
+description = "Convert text between naming conventions (camelCase, kebab-case, snake_case, …) straight from the launcher."
+plugin_api = 3
+tags = ["launcher", "utility", "development"]
