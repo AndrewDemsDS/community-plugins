@@ -159,6 +159,7 @@ body:
         - webapp-maker
         - wireview-pro-ii
         - wl-screen-mirror
+        - youtube-search
         - zed-provider
 
     validations:
