@@ -162,16 +162,129 @@ local MAX_FRIENDLY_NAME_LENGTH = 255
 -- Comfortably past id + name, so a record is never cut short by it.
 local MAX_RECORD_SCAN = 1024
 
+local function finishBrowserLoad(list, failed)
+    allEntities = list
+    browserLoading = false
+    browserLoadingSince = nil
+    browserFailed = failed == true
+    render()
+end
+
+-- HA iterates `states` in entity_id order, so "check" is normally the only stage this
+-- ever runs. Sorting is resumable across ticks like the /api/states conversion below:
+-- "check" and "rebuild" are plain loops that yield every SORT_STEP_PER_TICK records, and
+-- "collect" builds a flat id array so the eventual table.sort(ids) call has no Lua
+-- comparator. table.sort itself is still one uninterruptible native call, but with a
+-- default comparator over strings it never calls back into Lua, so it stays fast even
+-- for a large id array.
+local pendingSortList = nil
+local pendingSortStage = nil -- "check" | "collect" | "rebuild"
+local pendingSortCursor = 1
+local pendingSortIds = nil
+local pendingSortById = nil
+local SORT_STEP_PER_TICK = 2000
+
+local function startSort(list)
+    pendingSortList = list
+    pendingSortStage = "check"
+    pendingSortCursor = 2
+end
+
+local function stepSort()
+    local list = pendingSortList
+    local total = #list
+    local n = 0
+
+    while true do
+        if pendingSortStage == "check" then
+            local i = pendingSortCursor
+            while i <= total do
+                if list[i].entity_id < list[i - 1].entity_id then
+                    pendingSortStage = "collect"
+                    pendingSortCursor = 1
+                    pendingSortIds = {}
+                    pendingSortById = {}
+                    break
+                end
+                i += 1
+                pendingSortCursor = i
+                n += 1
+                if n >= SORT_STEP_PER_TICK then return end
+            end
+            if pendingSortStage == "check" then break end -- already sorted
+
+        elseif pendingSortStage == "collect" then
+            local ids, byId = pendingSortIds, pendingSortById
+            local i = pendingSortCursor
+            while i <= total do
+                local e = list[i]
+                ids[i] = e.entity_id
+                byId[e.entity_id] = e
+                i += 1
+                pendingSortCursor = i
+                n += 1
+                if n >= SORT_STEP_PER_TICK then return end
+            end
+            table.sort(ids)
+            pendingSortStage = "rebuild"
+            pendingSortCursor = 1
+            return -- give table.sort its own tick before rebuild starts
+
+        else -- "rebuild"
+            local ids, byId = pendingSortIds, pendingSortById
+            local i = pendingSortCursor
+            while i <= total do
+                list[i] = byId[ids[i]]
+                i += 1
+                pendingSortCursor = i
+                n += 1
+                if n >= SORT_STEP_PER_TICK then return end
+            end
+            break
+        end
+    end
+
+    pendingSortList = nil
+    pendingSortStage = nil
+    pendingSortIds = nil
+    pendingSortById = nil
+    finishBrowserLoad(list)
+end
+
 -- Scans with plain string.find only. A Lua pattern such as "([^\t\n]+)\t" backtracks
 -- through every separator-free byte and gmatch then restarts one byte later, so a
 -- response that lost its tabs costs O(bytes^2) inside a single uninterruptible C call:
 -- seconds of CPU, which the host kills for overrunning the callback budget.
-local function parseEntityList(body)
-    local list = {}
-    local len = #body
+--
+-- Even at O(n) this is a synchronous scan over the whole body, so on a large instance
+-- it is itself resumable across ticks, like the sort job above: pendingParse* carries
+-- the position between calls, and stepParse() yields every PARSE_STEP_PER_TICK records.
+local pendingParseBody = nil
+local pendingParsePos = 1
+local pendingParseList = nil
+local pendingParseSplitOnSpace = false
+local pendingParseLabel = nil
+local pendingParseOnUnusable = nil
+local PARSE_STEP_PER_TICK = 2000
+
+local function startParse(body, label, onUnusable)
+    pendingParseBody = body
+    pendingParsePos = 1
+    pendingParseList = {}
     -- Without any newline the whole body is one record, so a space is not a separator.
-    local splitOnSpace = string.find(body, "\n", 1, true) ~= nil
-    local pos = 1
+    pendingParseSplitOnSpace = string.find(body, "\n", 1, true) ~= nil
+    pendingParseLabel = label
+    pendingParseOnUnusable = onUnusable
+end
+
+local function stepParse()
+    local body = pendingParseBody
+    local len = #body
+    local list = pendingParseList
+    local splitOnSpace = pendingParseSplitOnSpace
+    local pos = pendingParsePos
+    local n = 0
+
     while pos <= len do
         local eol = string.find(body, "\n", pos, true) or (len + 1)
         local lineEnd = eol - 1
@@ -195,26 +308,29 @@ local function parseEntityList(body)
             })
         end
         pos = eol + 1
+        pendingParsePos = pos
+        n += 1
+        if n >= PARSE_STEP_PER_TICK then return end
     end
-    return list
-end
 
--- HA iterates `states` in entity_id order, so this is normally just the linear check.
-local function sortEntitiesIfNeeded(list)
-    for i = 2, #list do
-        if list[i].entity_id < list[i - 1].entity_id then
-            table.sort(list, function(a, b) return a.entity_id < b.entity_id end)
-            return
-        end
+    local label, onUnusable = pendingParseLabel, pendingParseOnUnusable
+    pendingParseBody = nil
+    pendingParseList = nil
+    pendingParseLabel = nil
+    pendingParseOnUnusable = nil
+    pendingParsePos = 1
+
+    if #list == 0 then
+        -- The preview is what tells us how a given instance actually answers.
+        local preview = string.gsub(string.sub(body, 1, 120), "%c", ".")
+        noctalia.log(label .. " template returned nothing usable (" .. len
+            .. " bytes, starts with: " .. preview .. ")")
+        onUnusable()
+        return
     end
-end
 
-local function finishBrowserLoad(list, failed)
-    allEntities = list
-    browserLoading = false
-    browserLoadingSince = nil
-    browserFailed = failed == true
-    render()
+    startSort(list)
+    stepSort()
 end
 
 -- /api/states on a large instance decodes for longer than one callback is allowed to
@@ -259,11 +375,10 @@ local function consumePendingStates()
     end
 
     if i > total then
-        -- Cleared only once the sort is through, so an abort here retries next tick.
-        sortEntitiesIfNeeded(list)
         pendingStates = nil
         pendingList = nil
-        finishBrowserLoad(list)
+        startSort(list)
+        stepSort()
     end
 end
 
@@ -320,19 +435,8 @@ local function fetchAllEntitiesFromTemplate(template, label, onUnusable)
             return
         end
 
-        local list = parseEntityList(body)
-
-        if #list == 0 then
-            -- The preview is what tells us how a given instance actually answers.
-            local preview = string.gsub(string.sub(body, 1, 120), "%c", ".")
-            noctalia.log(label .. " template returned nothing usable (" .. #body
-                .. " bytes, starts with: " .. preview .. ")")
-            onUnusable()
-            return
-        end
-
-        sortEntitiesIfNeeded(list)
-        finishBrowserLoad(list)
+        startParse(body, label, onUnusable)
+        stepParse()
     end)
 end
 
@@ -785,7 +889,16 @@ end
 function update()
     local now = os.clock()
 
-    -- A load that is still converting is making progress, so it outranks the timeout.
+    -- A load that is still parsing, converting, or sorting is making progress, so it
+    -- outranks the timeout.
+    if pendingParseBody ~= nil then
+        stepParse()
+        return
+    end
+    if pendingSortStage ~= nil then
+        stepSort()
+        return
+    end
     if pendingStates ~= nil then
         consumePendingStates()
         return
