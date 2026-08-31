@@ -4,8 +4,9 @@ Your AI plan quota in the Noctalia bar: how much of the window is spent, when it
 resets, and whether you are burning it faster than the clock.
 
 The numbers come from [ai-usagebar](https://github.com/akitaonrails/ai-usagebar),
-a Rust CLI that reads Claude, Codex, Cursor, Antigravity, Kiro, Z.AI,
-OpenRouter, DeepSeek, Kimi and Grok, among others. This plugin never talks to a
+a Rust CLI that reads Claude, Codex, Cursor, Antigravity, Kiro, Z.AI, Nous
+Research, OpenCode Go, Command Code, OpenRouter, DeepSeek, Kimi and Grok, among
+others. This plugin never talks to a
 provider, holds a token, or reads a credential file. It runs
 `ai-usagebar usage --json` and draws the answer.
 
@@ -46,6 +47,10 @@ the bar is the plan closest to running out. Raise `provider_limit` and it
 carries the next busiest ones too, with a `+N` for whatever did not fit. Pin a
 provider instead, or add the widget twice, when you want two fixed plans side by
 side.
+
+Named accounts use the label from the CLI config. Pick the provider and put the
+label in `account`: `vendor = "openai"` with `account = "work"` follows the
+`openai@work` report entry. Leave it empty for the provider's default account.
 
 The capsule is put together the way the core `sysmon` widget is, with the same
 key names, so the CPU reading beside it is configured with the same vocabulary.
@@ -97,17 +102,34 @@ it or press the same widget again.
 
 The list follows the CLI. A provider the CLI reports no API key for never
 appears, because it was never set up. One that is set up and unreachable keeps
-its row and shows the CLI's own words, so Antigravity with its local server
-down says to open Antigravity rather than vanishing.
+its row, marked unavailable, and shows the CLI's own words, so Antigravity with
+its local server down says to open Antigravity rather than vanishing.
+
+A provider's readings share one card, so its session and its week are read
+together. Antigravity's plan spans two models and reports each of them once per
+window, so its cards are keyed by model, titled with it, and each reading is
+headed by the window it covers. Every other provider reports one subject, which
+the pane's own header already names, so its readings head themselves and the
+card goes untitled.
 
 The detail pane spells out what the CLI reports for that provider instead of
-implying it: the plan and account name, when it was fetched, a stale flag when
-the reading is old, and the status when it is anything other than a healthy
-read. Each window gets its label, the percentage, the raw value string when
-that says more than the percentage, how much of the window has elapsed, the
-time left with the clock time (or date) its reset lands on, the pace line, and
-the severity as a word whenever the CLI calls the window high or critical.
-Credit blocks and free text rows appear as the CLI writes them.
+implying it: the plan and account name, when it was fetched, and a stale flag
+when the reading is old. Each window gets its label, the percentage, the raw
+value string when that says more than the percentage, how much of the window has
+elapsed, the time left with the clock time (or date) its reset lands on, the
+pace line, and the severity as a word whenever the CLI calls the window high or
+critical. Credit blocks and free text rows appear as the CLI writes them.
+
+A provider that is down draws no gauges. A bar reads as a live reading, and
+nothing is reading it: the warning takes their place, and the numbers it was
+last seen with follow as dated text. If the plan changed since, they are dropped
+instead -- a plan carries the limits every percentage is measured against, so a
+reading taken under the old one says nothing about the new one.
+
+The plan a provider was last seen on is remembered only for as long as the panel
+process lives, and only for providers the current report still carries. After a
+shell reload there is no previous plan to compare against, so the first reading
+that follows is shown whatever the plan says.
 
 To open the panel from a terminal:
 
@@ -128,6 +150,7 @@ Per widget instance, so two capsules can follow two providers:
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
 | `vendor` | `select` | `auto` | Which plan this capsule tracks. `auto` follows the busiest provider, with the CLI's own `[ui] primary` breaking ties. |
+| `account` | `string` | empty | Optional named account label from the CLI config. Ignored on `auto`. |
 | `visualization` | `select` | `none` | `gauge` or `none`, as described above. |
 | `show_value` | `bool` | `true` | Show the percentage as text. |
 | `show_glyph` | `bool` | `true` | Show the provider's icon. |
@@ -162,8 +185,16 @@ noctalia msg plugin felipeartur/ai-usagebar:poller all select anthropic
   it knows arrives on that command's stdout.
 - A provider that fails still comes back as an entry with `status = "error"`, so
   one broken provider does not blank the others. A reading the CLI marks stale
-  keeps showing, flagged by an icon in the list, the capsule, and the panel's
-  detail pane.
+  keeps showing, flagged by an icon in the list and the panel's detail pane.
+- A provider whose service is down leaves the bar on the first report that says
+  so, rather than sitting in the capsule with a number nothing is refreshing. It
+  is not counted behind the `+n`: that count is what the panel has more of, and
+  this one has nothing to show. It comes back the moment a report carries a
+  reading for it again.
+- A failed read does not erase the last one. The failure is said once, as a
+  banner in the panel and a flag on the capsule, over readings that are simply
+  older than they should be; the panel only gives itself over to the failure
+  when there is no report behind it at all.
 
 ## Tests
 
@@ -173,11 +204,18 @@ part worth a test. From the `ai-usagebar` directory:
 ```sh
 lua tests/scrub_test.lua
 lua tests/refresh_test.lua
+lua tests/bar_test.lua
+lua tests/panel_test.lua
+TZ=America/New_York lua tests/shared_test.lua
 ```
 
 The first test reads `safeText` and `scrub` out of `service.luau` rather than
 copying them, then checks that real credential shapes never survive, that ordinary
 readings pass through unchanged, and that scrubbing a four-vendor report stays
 inside the CPU budget the poller's async callback is given. The second exercises
-the coalesced refresh state and checks that every provider it knows about has a
-glyph of its own rather than the fallback. An overrun in the first test loses the whole reading, not just time.
+the coalesced refresh state, rejects output from a timed-out process, and checks
+that every provider it knows about has a glyph of its own rather than the fallback.
+The third drives the real bar script through default, named, missing and automatic
+account selection, plus malformed metrics. The fourth checks that malformed panel
+sections degrade safely. The fifth verifies UTC parsing through a daylight-saving
+transition. An overrun in the first test loses the whole reading, not just time.

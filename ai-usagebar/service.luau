@@ -12,43 +12,46 @@ local function intervalMs()
     return math.floor(minutes * 60 * 1000)
 end
 
--- Everything the CLI prints reaches the screen, so it is cleaned here, on the
--- way in: an error can quote the request that failed, and that request can carry
--- a key. A secret's value runs to the whitespace, quote or brace that closes it,
+-- Everything the CLI prints reaches the screen, and an error can quote a request
+-- that carried a key. A value runs to the whitespace, quote or brace closing it,
 -- so a JSON field loses its value and keeps its punctuation.
 local SECRET_VALUE = "[^%s\"',}]+"
--- Built once: safeText runs on every string in the report, about 165 of them for
--- a two-vendor read, and rebuilding these pairs each time cost more than matching
--- them.
+-- Built once: safeText runs on ~165 strings per two-vendor read, and rebuilding
+-- these cost more than matching them.
 local SECRET_PATTERNS = {}
+local function anyCase(word)
+    return (word:gsub("%a", function(c) return "[" .. c:upper() .. c .. "]" end))
+end
 for _, word in ipairs({ "key", "token", "secret", "password" }) do
-    local anyCase = (word:gsub("%a", function(c) return "[" .. c:upper() .. c .. "]" end))
-    local name = "[%w_%-]*" .. anyCase .. "[%w_%-]*"
+    local name = "[%w_%-]*" .. anyCase(word) .. "[%w_%-]*"
     SECRET_PATTERNS[#SECRET_PATTERNS + 1] = {
         word = word,
         -- Only the keyword that collides with a metric label keeps its numbers.
+        -- Each keyword redacts on a pass of its own, so `api_key_tokens` has this
+        -- exemption taken back by the `key` pass.
         keepsReadings = word == "token",
-        -- name=value: a query string, a shell assignment, or a line out of the
-        -- CLI's own TOML, where the separator is padded and the value quoted.
-        assign = "(" .. name .. "%s*=%s*\"?)" .. SECRET_VALUE,
-        -- name: value: an HTTP header or a JSON field. The value is captured
-        -- rather than swallowed, because this shape is also how the CLI labels a
-        -- reading -- "Tokens: 45000 / 100000" -- and a plugin that draws token
-        -- counts cannot redact them.
-        colon = "(" .. name .. "\"?%s*:%s*\"?)(" .. SECRET_VALUE .. ")",
+        -- name=value: query string, shell assignment, or the CLI's own TOML.
+        assign = "(" .. name .. "%s*=%s*[\"']?)" .. SECRET_VALUE,
+        -- name: value: an HTTP header or a JSON field. Captured rather than
+        -- swallowed: it is also how the CLI labels a reading.
+        colon = "(" .. name .. "[\"']?%s*:%s*[\"']?)(" .. SECRET_VALUE .. ")",
     }
 end
+local BASIC_AUTH_PATTERN = "(" .. anyCase("authorization") .. "[\"']?%s*:%s*[\"']?"
+    .. anyCase("basic") .. "%s+)" .. SECRET_VALUE
 
--- A quota or a percentage is not a credential. The exemption is deliberately
--- narrow: short, digits only, and offered to `token` alone. "Tokens: 45000" is a
--- reading this plugin exists to draw, while a bare number after `password` or
--- `secret` never is, and a long run of digits is a credential whatever labels it.
-local function isReading(value)
-    return #value <= 9 and value:match("^%d[%d%.,]*%%?$") ~= nil
+-- A quota is not a credential, but the exemption stays narrow: short, digits
+-- only, and offered to labels that count tokens. The plural separates the two --
+-- `input_tokens` counts, `access_token` authenticates -- and a long run of digits
+-- is a credential whatever labels it.
+local function isReading(prefix, value)
+    local label = prefix:lower():match("([%w_%-]+)[\"']?%s*:%s*[\"']?$")
+    local metric = label ~= nil and (label == "token" or label:find("tokens", 1, true) ~= nil)
+    return metric and #value <= 9 and value:match("^%d[%d%.,]*%%?$") ~= nil
 end
 
 local function redactColon(prefix, value)
-    if isReading(value) then return prefix .. value end
+    if isReading(prefix, value) then return prefix .. value end
     return prefix .. "<redacted>"
 end
 -- Nine characters before the rest of a provider key, so a bare "sk-" in prose
@@ -59,14 +62,12 @@ local function safeText(value)
     local text = noctalia.string.trim(tostring(value or ""))
     text = text:gsub("%s+", " ")
 
-    -- Capped before the redaction, not after. The patterns are the expensive part
-    -- of the callback, and a callback that overruns its CPU budget loses the whole
-    -- report, so they only ever scan what the plugin would draw.
+    -- Capped before the redaction: the patterns are the expensive part, and a
+    -- callback that overruns its CPU budget loses the whole report.
     if #text > 200 then text = string.sub(text, 1, 200) .. "..." end
 
-    -- A literal search gates each keyword's own two patterns. Gating on the
-    -- separator instead does not work: `=` and `:` turn up in ordinary readings,
-    -- in ratios, clock times and URLs.
+    -- A literal search gates each keyword's patterns. Gating on the separator
+    -- does not work: `=` and `:` turn up in ratios, clock times and URLs.
     local lower = text:lower()
 
     for _, secret in ipairs(SECRET_PATTERNS) do
@@ -78,6 +79,10 @@ local function safeText(value)
 
     if lower:find("bearer", 1, true) then
         text = text:gsub("([Bb][Ee][Aa][Rr][Ee][Rr]%s+)" .. SECRET_VALUE, "%1<redacted>")
+    end
+
+    if lower:find("authorization", 1, true) and lower:find("basic", 1, true) then
+        text = text:gsub(BASIC_AUTH_PATTERN, "%1<redacted>")
     end
 
     -- Credentials in the userinfo half of a URL the CLI echoed back.
@@ -93,8 +98,7 @@ local function safeText(value)
     return text
 end
 
--- Every string, not just the error: a plan name or a metric detail is CLI text
--- too, and any of them can arrive long.
+-- Every string, not just the error: a plan name is CLI text too.
 local function scrub(value)
     if type(value) == "string" then return safeText(value) end
     if type(value) ~= "table" then return value end
@@ -109,8 +113,7 @@ local function failure(code, detail)
 end
 
 -- The run's outcome as one code. A missing binary gets its own, because the
--- panel offers an install link for that one. Status 127 is the shell's own
--- "command not found"; the CLI never exits with it once it is on PATH.
+-- panel offers an install link for it. 127 is the shell's "command not found".
 local function classify(result)
     if result == nil then return failure("spawn_failed") end
     if result.timedOut then return failure("timed_out") end
@@ -120,8 +123,7 @@ local function classify(result)
         return failure("not_installed", stderr)
     end
     if result.exitCode ~= 0 then
-        -- Whitespace-only stderr scrubs down to nothing, so the exit code answers
-        -- for it instead.
+        -- Whitespace-only stderr scrubs to nothing; the exit code answers for it.
         return failure("failed", stderr:find("%S") and stderr
             or ("ai-usagebar exited with code " .. tostring(result.exitCode)))
     end
@@ -163,7 +165,8 @@ local function refresh()
         inFlight = false
         noctalia.state.set("polling", false)
 
-        local decoded = result ~= nil and noctalia.json.decode(result.stdout or "") or nil
+        local decoded = result ~= nil and not result.timedOut
+            and noctalia.json.decode(result.stdout or "") or nil
         if type(decoded) == "table" and type(decoded.entries) == "table" then
             -- A failed vendor still comes back as an entry with `status = "error"`,
             -- so a non-zero exit is no reason to drop the report.
