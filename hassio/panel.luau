@@ -151,11 +151,11 @@ end
 -- per-callback CPU budget. The tab and newline outside the {{ }} are the record
 -- separators; the ones inside replace() are escapes for Jinja to interpret.
 local ENTITY_LIST_TEMPLATE =
-    "{% for s in states %}{{ s.entity_id }}\t{{ s.name | replace('\\t',' ') | replace('\\n',' ') }}\n{% endfor %}"
+    "{% for s in (states | sort(attribute='entity_id')) %}{{ s.entity_id }}\t{{ s.name | replace('\\t',' ') | replace('\\n',' ') }}\n{% endfor %}"
 
 -- Same shape minus the friendly names, for instances that reject the template above.
 local ENTITY_ID_TEMPLATE =
-    "{% for s in states %}{{ s.entity_id }}\n{% endfor %}"
+    "{% for s in (states | sort(attribute='entity_id')) %}{{ s.entity_id }}\n{% endfor %}"
 
 local MAX_ENTITY_ID_LENGTH = 255
 local MAX_FRIENDLY_NAME_LENGTH = 255
