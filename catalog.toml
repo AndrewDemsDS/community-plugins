@@ -1512,8 +1512,8 @@ tags = ["bar", "panel", "launcher", "service", "network", "privacy", "utility"]
 [[plugin]]
 id = "tordex/system-updater"
 name = "System Updates Manager"
-version = "1.2.0"
-updated_at = 1788121759
+version = "1.2.1"
+updated_at = 1788198248
 added_at = 1786923801
 author = "tordex"
 license = "MIT"
