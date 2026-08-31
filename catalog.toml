@@ -1934,8 +1934,8 @@ tags = ["hyprland", "animation", "theming", "panel", "bar"]
 [[plugin]]
 id = "mellotanica/launcher-pass"
 name = "Launcher pass"
-version = "2.0.0"
-updated_at = 1788118014
+version = "2.6.0"
+updated_at = 1788198606
 added_at = 1788118014
 author = "Marco Melletti"
 license = "MIT"
