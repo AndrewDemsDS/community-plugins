@@ -611,15 +611,15 @@ rev = "0162521282828e0f6313b76bbf45ac919505f251"
 [[plugin]]
 id = "blackbartblues/audio-switcher"
 name = "Audio Switcher"
-version = "0.5.0"
-updated_at = 1786156539
+version = "0.6.0"
+updated_at = 1788198742
 added_at = 1784847459
 author = "blackbartblues"
 license = "MIT"
 icon = "switch-horizontal"
 description = "Switch audio inputs and outputs, hand off Bluetooth devices, and control them from compositor keybinds."
 plugin_api = 15
-tags = ["audio", "bar", "hardware", "panel", "service", "system", "utility"]
+tags = ["audio", "bar", "hardware", "launcher", "panel", "service", "system", "utility"]
 
 [[plugin.release]]
 plugin_api = 9
@@ -1467,8 +1467,8 @@ tags = ["bar", "niri", "panel", "service", "system", "utility"]
 [[plugin]]
 id = "felipeartur/ai-usagebar"
 name = "AI Usage"
-version = "2.0.0"
-updated_at = 1787690403
+version = "2.1.0"
+updated_at = 1788198733
 added_at = 1786903781
 author = "felipeartur"
 license = "MIT"
