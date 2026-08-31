@@ -13,6 +13,12 @@ secret.
 | ID      | `mdj2812/mihomo-control`    |
 | Entries | Bar widget: `widget`; panels: `panel`, `panel-attached`; service: `service`; shortcut: `mode` |
 
+## Requirements
+
+- Network access to the Mihomo external controller (local or remote)
+- On `PATH` (declared in `plugin.toml` `dependencies`):
+  - `jq` — project oversized `/connections` and `/proxies` API responses during polling
+
 ## Usage
 
 Add the **Mihomo Control** widget from the Add-widget picker. By default it
@@ -35,7 +41,11 @@ The first command opens the centered floating panel; the second opens the
 variant attached to the bar.
 
 The panel lets you switch the proxy mode (rule / global / direct), restart the
-server, refresh the status, and manage every proxy group. Each group card
+core, refresh the status, and manage every proxy group. Use the **Server**
+dropdown to switch between saved controller profiles (host, port, secret, TLS).
+**Manage** edits the active profile; profiles and per-server proxy-group order
+are stored in the plugin data directory. Right-click the refresh button to
+reload the whole plugin; left-click only re-polls the controller. Each group card
 lists all of its members with their latency — sourced from mihomo's health
 checks and refreshed by the group's **Test latency** button. Each card also
 shows an overall latency (the selected member's, or the best tested one) right
@@ -81,7 +91,8 @@ noctalia msg plugin mdj2812/mihomo-control:service all cmd '{"op":"mode","mode":
 
 `refresh` re-polls version, config, connections and proxy groups. `cmd` accepts
 the same command tables the panel sends (`mode`, `select`, `delay_test`,
-`delay_test_all`, `reorder_group`, `restart`, `close_connections`, `refresh`).
+`delay_test_all`, `reorder_group`, `restart`, `close_connections`, `refresh`,
+`select_server`, `save_server`, `delete_server`).
 `self-test` runs in-process checks for group ordering, traffic dedup helpers,
 and watchdog interval setup; results are published to `mihomo.self_test`.
 
@@ -109,10 +120,13 @@ noctalia msg plugin mdj2812/mihomo-control:service all self-test
 
 ## Notes
 
-- The plugin only talks HTTP to the configured external controller. It spawns
-  no processes and runs no external commands. It writes only the custom
-  proxy-group display order (group names, never the secret) to its Noctalia
-  plugin data directory. Reordering does not modify the Mihomo configuration.
+- The plugin talks HTTP to the configured external controller and shells out to
+  `jq` to project oversized `/connections` and `/proxies` responses so polling
+  stays within Noctalia's Luau CPU budget. It also runs `noctalia msg plugins
+  disable` / `enable` when the panel refresh button is right-clicked. It writes
+  server profiles and per-server proxy-group display order (group names, never
+  the secret) to its Noctalia plugin data directory. Reordering does not modify
+  the Mihomo configuration.
 - The bar widget uses a tintable glyph traced from the Clash cat silhouette. By
   default it is green online, amber while connecting and red offline; **Icon
   color mode** can instead apply one custom color. The panel keeps the official

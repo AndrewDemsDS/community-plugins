@@ -72,20 +72,42 @@ local traffic = { up = 1, down = 2, upTotal = 3, downTotal = 4 }
 assert(logic.traffic_changed(traffic, { up = 1, down = 2, upTotal = 3, downTotal = 4 }) == false, "identical traffic is unchanged")
 assert(logic.traffic_changed(traffic, { up = 9, down = 2, upTotal = 3, downTotal = 4 }) == true, "changed traffic is detected")
 
-local sample_connections = [[
-{"downloadTotal":6694145524,"uploadTotal":123456,"connections":[
-{"id":"a","metadata":{"host":"example.com"},"upload":1,"download":2,"chains":["DIRECT"]},
-{"id":"b","metadata":{"host":"other.com"},"upload":3,"download":4,"chains":["Proxy"]}
-],"memory":116858880}
-]]
+local sample_connections = {
+  downloadTotal = 6694145524,
+  uploadTotal = 123456,
+  memory = 116858880,
+  connections = {
+    { id = "a", chains = { "DIRECT" } },
+    { id = "b", chains = { "Proxy" } },
+  },
+}
 local summary = logic.parse_connections_summary(sample_connections)
 assert(summary ~= nil, "connections summary parses")
 assert_eq(summary.count, 2, "connection count")
 assert_eq(summary.downloadTotal, 6694145524, "download total")
 assert_eq(summary.uploadTotal, 123456, "upload total")
 assert_eq(summary.memory, 116858880, "memory")
-assert(logic.parse_connections_summary("") == nil, "empty body is rejected")
-assert(logic.parse_connections_summary("{") == nil, "invalid body is rejected")
+
+local jq_summary = logic.parse_connections_summary({
+  count = 105,
+  downloadTotal = 7941293315,
+  uploadTotal = 283438043,
+  memory = 0,
+})
+assert(jq_summary ~= nil, "jq-shaped summary parses")
+assert_eq(jq_summary.count, 105, "jq count field")
+
+assert(logic.parse_connections_summary(nil) == nil, "nil is rejected")
+assert(logic.parse_connections_summary("not a table") == nil, "non-table is rejected")
+
+assert(
+  logic.connections_body_needs_external_decode(string.rep("x", logic.CONNECTIONS_INLINE_DECODE_LIMIT)) == false,
+  "at-limit connections body stays inline"
+)
+assert(
+  logic.connections_body_needs_external_decode(string.rep("x", logic.CONNECTIONS_INLINE_DECODE_LIMIT + 1)) == true,
+  "over-limit connections body uses jq"
+)
 
 local sample_proxies = {
   proxies = {
@@ -129,5 +151,39 @@ assert_eq(from_slim[1].members[1].delay, 42, "slim member delay")
 
 assert(logic.proxies_body_needs_external_decode(string.rep("x", logic.PROXIES_INLINE_DECODE_LIMIT)) == false, "at-limit body stays inline")
 assert(logic.proxies_body_needs_external_decode(string.rep("x", logic.PROXIES_INLINE_DECODE_LIMIT + 1)) == true, "over-limit body uses jq")
+
+local server = logic.normalize_server({
+  id = "home",
+  name = "Home",
+  host = "127.0.0.1",
+  port = 9090,
+  secret = "token",
+})
+assert(server ~= nil, "server normalizes")
+assert_eq(server.port, 9090, "server port")
+
+local public = logic.public_server_view(server)
+assert(public.secret == nil, "public view hides secret")
+assert(public.hasSecret == true, "public view notes secret")
+
+local store = logic.normalize_servers_store({
+  activeId = "home",
+  servers = { server },
+  groupOrders = { home = { "A", "B" } },
+})
+assert_eq(store.activeId, "home", "store active id")
+assert_eq(#store.servers, 1, "store keeps servers")
+assert_eq(store.groupOrders.home[1], "A", "store keeps group order")
+
+local updated = logic.upsert_server(store.servers, {
+  id = "home",
+  name = "Home Lab",
+  host = "10.0.0.2",
+  port = 9090,
+})
+assert_eq(updated[1].name, "Home Lab", "upsert replaces server")
+
+local reduced = logic.delete_server(updated, "home")
+assert_eq(#reduced, 0, "delete removes server")
 
 print("mihomo-control group_logic tests: ok")

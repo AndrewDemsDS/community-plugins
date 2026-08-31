@@ -4,6 +4,7 @@
 local M = {}
 
 M.PROXIES_INLINE_DECODE_LIMIT = 65536
+M.CONNECTIONS_INLINE_DECODE_LIMIT = 8192
 
 function M.clamp_interval(seconds)
   local value = tonumber(seconds) or 2
@@ -94,28 +95,23 @@ function M.traffic_changed(previous, next_values)
   )
 end
 
--- Mihomo's /connections payload can be large when many flows are active. The
--- panel only needs totals and a count, so scrape those fields without a full
--- json.decode that can exceed Noctalia's per-callback CPU budget.
-function M.parse_connections_summary(body)
-  if type(body) ~= "string" or body == "" then
+function M.connections_body_needs_external_decode(body)
+  return type(body) == "string" and #body > M.CONNECTIONS_INLINE_DECODE_LIMIT
+end
+
+function M.parse_connections_summary(data)
+  if type(data) ~= "table" then
     return nil
   end
-  local downloadTotal = tonumber(body:match('"downloadTotal"%s*:%s*(%d+)'))
-  local uploadTotal = tonumber(body:match('"uploadTotal"%s*:%s*(%d+)'))
-  local memory = tonumber(body:match('"memory"%s*:%s*(%d+)'))
-  if downloadTotal == nil and uploadTotal == nil and memory == nil then
-    return nil
-  end
-  local count = 0
-  for _ in body:gmatch('"chains"%s*:') do
-    count = count + 1
+  local count = tonumber(data.count)
+  if count == nil and type(data.connections) == "table" then
+    count = #data.connections
   end
   return {
-    count = count,
-    downloadTotal = downloadTotal or 0,
-    uploadTotal = uploadTotal or 0,
-    memory = memory or 0,
+    count = count or 0,
+    downloadTotal = tonumber(data.downloadTotal) or 0,
+    uploadTotal = tonumber(data.uploadTotal) or 0,
+    memory = tonumber(data.memory) or 0,
   }
 end
 
@@ -192,6 +188,168 @@ function M.build_groups_from_slim_proxies(slim, default_test_url)
     end
   end
   return groups
+end
+
+function M.normalize_port(value)
+  local port = tonumber(value)
+  if port == nil or port < 1 or port > 65535 then
+    return nil
+  end
+  return math.floor(port)
+end
+
+function M.normalize_server(raw)
+  if type(raw) ~= "table" then
+    return nil
+  end
+  local id = type(raw.id) == "string" and raw.id ~= "" and raw.id or nil
+  local host = type(raw.host) == "string" and raw.host ~= "" and raw.host or nil
+  local port = M.normalize_port(raw.port)
+  if id == nil or host == nil or port == nil then
+    return nil
+  end
+  local name = type(raw.name) == "string" and raw.name ~= "" and raw.name or (host .. ":" .. tostring(port))
+  local test_url = ""
+  if type(raw.testUrl) == "string" then
+    test_url = raw.testUrl
+  elseif type(raw.test_url) == "string" then
+    test_url = raw.test_url
+  end
+  return {
+    id = id,
+    name = name,
+    host = host,
+    port = port,
+    secret = type(raw.secret) == "string" and raw.secret or "",
+    useHttps = raw.useHttps == true or raw.use_https == true,
+    allowInsecureTls = raw.allowInsecureTls == true or raw.allow_insecure_tls == true,
+    testUrl = test_url,
+  }
+end
+
+function M.public_server_view(server)
+  if type(server) ~= "table" then
+    return nil
+  end
+  return {
+    id = server.id,
+    name = server.name,
+    host = server.host,
+    port = server.port,
+    useHttps = server.useHttps == true,
+    allowInsecureTls = server.allowInsecureTls == true,
+    testUrl = server.testUrl or "",
+    hasSecret = server.secret ~= "",
+  }
+end
+
+function M.server_from_plugin_settings(id, name, cfg)
+  if type(cfg) ~= "table" then
+    return nil
+  end
+  local host = type(cfg.host) == "string" and cfg.host ~= "" and cfg.host or "127.0.0.1"
+  local port = M.normalize_port(cfg.port) or 9090
+  return M.normalize_server({
+    id = id,
+    name = name,
+    host = host,
+    port = port,
+    secret = type(cfg.secret) == "string" and cfg.secret or "",
+    use_https = cfg.use_https == true,
+    allow_insecure_tls = cfg.allow_insecure_tls == true,
+    test_url = type(cfg.test_url) == "string" and cfg.test_url or "",
+  })
+end
+
+function M.normalize_servers_store(raw)
+  local store = {
+    activeId = "",
+    servers = {},
+    groupOrders = {},
+  }
+  if type(raw) ~= "table" then
+    return store
+  end
+  if type(raw.activeId) == "string" then
+    store.activeId = raw.activeId
+  end
+  if type(raw.servers) == "table" then
+    for _, item in ipairs(raw.servers) do
+      local server = M.normalize_server(item)
+      if server ~= nil then
+        table.insert(store.servers, server)
+      end
+    end
+  end
+  if type(raw.groupOrders) == "table" then
+    for id, order in pairs(raw.groupOrders) do
+      if type(id) == "string" and id ~= "" and type(order) == "table" then
+        store.groupOrders[id] = M.normalize_group_order(order)
+      end
+    end
+  end
+  if store.activeId == "" and #store.servers > 0 then
+    store.activeId = store.servers[1].id
+  end
+  if M.find_server(store.servers, store.activeId) == nil and #store.servers > 0 then
+    store.activeId = store.servers[1].id
+  end
+  return store
+end
+
+function M.find_server(servers, id)
+  if type(servers) ~= "table" or type(id) ~= "string" or id == "" then
+    return nil
+  end
+  for _, server in ipairs(servers) do
+    if server.id == id then
+      return server
+    end
+  end
+  return nil
+end
+
+function M.upsert_server(servers, server)
+  local copy = {}
+  local replaced = false
+  for _, item in ipairs(servers or {}) do
+    if item.id == server.id then
+      table.insert(copy, server)
+      replaced = true
+    else
+      table.insert(copy, item)
+    end
+  end
+  if not replaced then
+    table.insert(copy, server)
+  end
+  return copy
+end
+
+function M.delete_server(servers, id)
+  local copy = {}
+  for _, item in ipairs(servers or {}) do
+    if item.id ~= id then
+      table.insert(copy, item)
+    end
+  end
+  return copy
+end
+
+function M.public_servers_state(store)
+  local list = {}
+  if type(store) == "table" and type(store.servers) == "table" then
+    for _, server in ipairs(store.servers) do
+      local view = M.public_server_view(server)
+      if view ~= nil then
+        table.insert(list, view)
+      end
+    end
+  end
+  return {
+    activeId = type(store) == "table" and store.activeId or "",
+    list = list,
+  }
 end
 
 return M
