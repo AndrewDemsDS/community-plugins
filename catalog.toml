@@ -2008,3 +2008,16 @@ icon = "droplet"
 description = "Display your LibreLinkUp blood glucose on the bar with trend arrow."
 plugin_api = 9
 tags = ["bar", "service", "utility", "indicator"]
+
+[[plugin]]
+id = "autumn/network-toolkit"
+name = "Network Toolkit"
+version = "0.1.0"
+updated_at = 1788205709
+added_at = 1788205709
+author = "Autumn"
+license = "MIT"
+icon = "world"
+description = "Unified control panel for Bluetooth, Wi-Fi, Ethernet, Hotspot, and DNS Switcher."
+plugin_api = 10
+tags = ["network", "bar", "panel", "service", "utility"]
