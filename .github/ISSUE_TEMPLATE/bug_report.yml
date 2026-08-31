@@ -99,6 +99,7 @@ body:
         - mihomo-control
         - mimir
         - mini-docker
+        - network-toolkit
         - nextboot-selector
         - niri-active-workspace
         - niri-animations
