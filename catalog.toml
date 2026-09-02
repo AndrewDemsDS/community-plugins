@@ -2022,3 +2022,17 @@ icon = "world"
 description = "Unified control panel for Bluetooth, Wi-Fi, Ethernet, Hotspot, and DNS Switcher."
 plugin_api = 10
 tags = ["network", "bar", "panel", "service", "utility"]
+
+[[plugin]]
+id = "yocraft/desktop-launcher"
+name = "Desktop Launcher"
+version = "1.0.0"
+updated_at = 1788314591
+added_at = 1788314591
+author = "yocraft"
+license = "MIT"
+icon = "launcher"
+description = "Launch your favorite apps from your desktop in one click."
+deprecated = false
+plugin_api = 3
+tags = ["desktop", "utility"]
