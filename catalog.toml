@@ -490,13 +490,14 @@ rev = "5c59d225b811675d858b7f8115c506962438ba2e"
 [[plugin]]
 id = "blackbartblues/keymap"
 name = "Keymap"
-version = "1.5.0"
-updated_at = 1787627868
+version = "1.5.1"
+updated_at = 1788314715
 added_at = 1784597775
 author = "blackbartblues"
 license = "MIT"
 icon = "keyboard"
 description = "View, create, organize, and edit Hyprland, Niri, and MangoWC keybindings."
+deprecated = true
 plugin_api = 9
 tags = ["bar", "panel", "service", "hyprland", "niri", "mangowc", "productivity", "utility"]
 
@@ -1526,8 +1527,8 @@ tags = ["bar", "panel", "service", "system"]
 [[plugin]]
 id = "tphilippot/git_companion"
 name = "Git Companion"
-version = "1.1.0"
-updated_at = 1788120279
+version = "1.2.0"
+updated_at = 1788314708
 added_at = 1786925440
 author = "thomas-philippot"
 license = "MIT"
