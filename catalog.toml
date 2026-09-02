@@ -1804,8 +1804,8 @@ tags = ["audio", "bar", "panel", "service", "hardware", "indicator"]
 [[plugin]]
 id = "arrifat346afs/systempulse"
 name = "SystemPulse"
-version = "1.1.0"
-updated_at = 1787832988
+version = "1.1.2"
+updated_at = 1788314036
 added_at = 1787832988
 author = "arrifat346afs "
 license = "MIT"
