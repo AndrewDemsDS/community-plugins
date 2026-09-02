@@ -2050,3 +2050,16 @@ icon = "brand-youtube-filled"
 description = "YouTube Music client for Noctalia v5 - miniplayer & full view"
 plugin_api = 23
 tags = ["music", "media"]
+
+[[plugin]]
+id = "0lucasmatheus/awwwall"
+name = "Awwwall"
+version = "0.1.0"
+updated_at = 1788316285
+added_at = 1788316285
+author = "0lucasmatheus"
+license = "MIT"
+icon = "photo"
+description = "Mirrors the official wallpaper picker into awww, for animated (GIF) wallpapers."
+plugin_api = 25
+tags = ["wallpaper"]
