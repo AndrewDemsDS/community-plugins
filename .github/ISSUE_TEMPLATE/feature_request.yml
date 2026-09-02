@@ -164,6 +164,7 @@ body:
         - wireview-pro-ii
         - wl-screen-mirror
         - youtube-search
+        - yt-music
         - zed-provider
 
     validations:
