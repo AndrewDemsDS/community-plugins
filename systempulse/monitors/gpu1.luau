@@ -1,6 +1,7 @@
 --!nonstrict
--- GPU 0 monitor detail view using nvtop for direct GPU data. On dual-GPU
--- systems this is the integrated GPU; single-GPU systems use this file as-is.
+-- Second GPU monitor detail view (GPU 1, the dedicated GPU) using nvtop.
+-- Only shown when nvtop reports more than one GPU; the single-GPU case is
+-- handled by gpu.luau.
 
 local MAX_SAMPLES = 60
 
@@ -18,12 +19,35 @@ local vramTotalBytes = nil
 local encodePercent = nil
 local decodePercent = nil
 local hasNvtop = false
+local hasSecondGpu = false
 local refresh = nil
 local M = {}
+
+-- -- TEMP TEST: fake second GPU (remove after testing)
+-- hasNvtop = true
+-- local FAKE_GPU = {
+--   device_name = "AMD Radeon RX 7900 XTX (FAKE)",
+--   gpu_util = "42%",
+--   temp = "55C",
+--   fan_speed = "0%",
+--   power_draw = "12W",
+--   gpu_clock = "2200MHz",
+--   mem_clock = "1800MHz",
+--   mem_used = "2147483648",
+--   mem_total = "34359738368",
+--   encode = "3%",
+--   decode = "7%",
+-- }
 
 function M.attach(fn)
   refresh = fn
   hasNvtop = noctalia.commandExists("nvtop")
+end
+
+-- True once nvtop reported a second GPU; the panel uses this to decide
+-- whether to show the "GPU 1" sidebar card.
+function M.hasSecondGpu()
+  return hasSecondGpu
 end
 
 function M.getPreview()
@@ -57,8 +81,6 @@ local function parseBytes(s)
   return tonumber(s)
 end
 
-local pendingNvtop = nil
-
 -- Orders GPUs so the integrated GPU comes first (GPU 0 = iGPU, GPU 1 = dGPU).
 -- iGPU signals are checked first because some iGPUs are branded "Arc Graphics".
 local function gpuOrderScore(name)
@@ -78,20 +100,22 @@ local function sortGpusIntegratedFirst(data)
   end)
 end
 
+local pendingNvtop = nil
+
 local function onNvtopResult(result)
   if result == nil or result.exitCode ~= 0 then return end
   local stdout = result.stdout
   if stdout == nil or stdout == "" then return end
   local ok, data = pcall(noctalia.json.decode, stdout)
-  if not ok or type(data) ~= "table" or data[1] == nil then return end
+  if not ok or type(data) ~= "table" or data[2] == nil then return end
   sortGpusIntegratedFirst(data)
-  pendingNvtop = data[1]
+  pendingNvtop = data[2]
 end
 
 function M.tick()
-  if hasNvtop then
-    noctalia.runAsync("nvtop -s", onNvtopResult, 5000)
-  end
+  if not hasNvtop then return end
+  -- TEMP TEST: inject fake data instead of calling nvtop (remove after testing)
+  -- pendingNvtop = FAKE_GPU
 
   if pendingNvtop ~= nil then
     local gpu = pendingNvtop
@@ -107,15 +131,12 @@ function M.tick()
     vramTotalBytes = parseBytes(gpu.mem_total)
     encodePercent = parsePercent(gpu.encode)
     decodePercent = parsePercent(gpu.decode)
-  else
-    local s = noctalia.systemStats()
-    if s ~= nil and s.gpu ~= nil then
-      usagePercent = s.gpu.usagePercent or usagePercent
-      tempC = s.gpu.tempC or tempC
-      vramUsedBytes = s.gpu.vramUsedBytes or vramUsedBytes
-      vramTotalBytes = s.gpu.vramTotalBytes or vramTotalBytes
-    end
+    hasSecondGpu = true
   end
+
+  -- No history before the second GPU is confirmed, so graphs only contain
+  -- real samples.
+  if not hasSecondGpu then return end
 
   table.insert(history, usagePercent / 100)
   local vramPct = (vramUsedBytes ~= nil and vramTotalBytes ~= nil and vramTotalBytes > 0) and (vramUsedBytes / vramTotalBytes) or 0
