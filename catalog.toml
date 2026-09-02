@@ -2037,3 +2037,16 @@ description = "Launch your favorite apps from your desktop in one click."
 deprecated = false
 plugin_api = 3
 tags = ["desktop", "utility"]
+
+[[plugin]]
+id = "aabidk20/yt-music"
+name = "YouTube Music"
+version = "0.2.3"
+updated_at = 1788315521
+added_at = 1788315521
+author = "Aabid"
+license = "MIT"
+icon = "brand-youtube-filled"
+description = "YouTube Music client for Noctalia v5 - miniplayer & full view"
+plugin_api = 23
+tags = ["music", "media"]
