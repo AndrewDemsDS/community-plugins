@@ -99,6 +99,7 @@ body:
         - mango_layouts
         - mangowm-keymode
         - mawaqit
+        - media-lyrics
         - mihomo-control
         - mimir
         - mini-docker
