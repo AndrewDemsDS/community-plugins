@@ -611,13 +611,14 @@ rev = "0162521282828e0f6313b76bbf45ac919505f251"
 [[plugin]]
 id = "blackbartblues/audio-switcher"
 name = "Audio Switcher"
-version = "0.6.0"
-updated_at = 1788198742
+version = "0.6.1"
+updated_at = 1788314109
 added_at = 1784847459
 author = "blackbartblues"
 license = "MIT"
 icon = "switch-horizontal"
 description = "Switch audio inputs and outputs, hand off Bluetooth devices, and control them from compositor keybinds."
+deprecated = true
 plugin_api = 15
 tags = ["audio", "bar", "hardware", "launcher", "panel", "service", "system", "utility"]
 
