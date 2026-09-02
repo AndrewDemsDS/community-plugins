@@ -129,6 +129,7 @@ body:
         - proton-pass
         - pulsar-mouse
         - qrcode
+        - remmina
         - rss-notifier
         - ruh-vpn
         - screen-toolkit
