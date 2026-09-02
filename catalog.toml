@@ -2089,3 +2089,16 @@ icon = "screen-share"
 description = "Open your saved Remmina connections from the launcher, the bar, or a panel."
 plugin_api = 24
 tags = ["launcher", "bar", "panel", "network", "utility", "productivity"]
+
+[[plugin]]
+id = "tranzem/media-lyrics"
+name = "Media Lyrics"
+version = "0.8.13"
+updated_at = 1788381228
+added_at = 1788381228
+author = "tranzem"
+license = "MIT"
+icon = "music"
+description = "Synced lyrics media panel: karaoke carousel, progress bar, marquee titles. Pure Luau; runtime needs busctl + curl."
+plugin_api = 24
+tags = ["media", "music", "panel", "service"]
