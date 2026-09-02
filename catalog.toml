@@ -1577,8 +1577,8 @@ tags = ["audio", "bar", "network", "panel", "privacy", "service"]
 [[plugin]]
 id = "mdj2812/thunderbird-companion"
 name = "Thunderbird Companion"
-version = "0.1.0"
-updated_at = 1787016139
+version = "0.1.1"
+updated_at = 1788313813
 added_at = 1787016139
 author = "mdj2812"
 license = "MIT"
