@@ -2063,3 +2063,16 @@ icon = "photo"
 description = "Mirrors the official wallpaper picker into awww, for animated (GIF) wallpapers."
 plugin_api = 25
 tags = ["wallpaper"]
+
+[[plugin]]
+id = "nirvam/bitdjinn"
+name = "BitDjinn"
+version = "1.0.0"
+updated_at = 1788317224
+added_at = 1788317224
+author = "nirvam"
+license = "MIT"
+icon = "currency-bitcoin"
+description = "Real-time cryptocurrency ticker, trend charts, and blockchain balance monitoring with transaction alerts."
+plugin_api = 19
+tags = ["utility", "indicator", "network", "panel", "bar"]
