@@ -108,6 +108,7 @@ body:
         - niri-active-workspace
         - niri-animations
         - niri-displays
+        - niri-rules-studio
         - nix-monitor
         - noctwhspr
         - nvtop
