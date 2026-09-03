@@ -2108,3 +2108,16 @@ icon = "music"
 description = "Synced lyrics media panel: karaoke carousel, progress bar, marquee titles. Pure Luau; runtime needs busctl + curl."
 plugin_api = 24
 tags = ["media", "music", "panel", "service"]
+
+[[plugin]]
+id = "redxtech/super-productivity"
+name = "Super Productivity"
+version = "1.0.0"
+updated_at = 1788400879
+added_at = 1788400879
+author = "Gabe Dunn"
+license = "MIT"
+icon = "checks"
+description = "Show, capture, complete, track, snooze, and open Super Productivity tasks from Noctalia."
+plugin_api = 24
+tags = ["bar", "panel", "service", "launcher", "productivity"]
