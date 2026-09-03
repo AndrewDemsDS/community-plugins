@@ -2121,3 +2121,16 @@ icon = "checks"
 description = "Show, capture, complete, track, snooze, and open Super Productivity tasks from Noctalia."
 plugin_api = 24
 tags = ["bar", "panel", "service", "launcher", "productivity"]
+
+[[plugin]]
+id = "setyvii/niri-rules-studio"
+name = "Niri Rules Studio"
+version = "0.1.0"
+updated_at = 1788468778
+added_at = 1788468778
+author = "SetyVII"
+license = "MIT"
+icon = "adjustments-horizontal"
+description = "Create, validate, and manage Niri window rules with a simple GUI."
+plugin_api = 24
+tags = ["bar", "panel", "niri", "utility"]
