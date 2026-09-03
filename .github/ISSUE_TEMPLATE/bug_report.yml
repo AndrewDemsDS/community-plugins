@@ -62,6 +62,7 @@ body:
         - drive-health
         - dropwall
         - ds4-color
+        - emoji-picker
         - eyecare
         - file-search
         - game-launcher
