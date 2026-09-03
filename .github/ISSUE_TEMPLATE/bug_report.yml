@@ -142,6 +142,7 @@ body:
         - spotify-lyrics
         - spotify-media
         - ssh-launcher
+        - super-productivity
         - syncthing
         - system-monitor
         - system-updater
