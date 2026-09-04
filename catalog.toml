@@ -2151,8 +2151,8 @@ tags = ["panel", "emoticon", "utility"]
 [[plugin]]
 id = "mezoahmedii/quranwidget"
 name = "Quran Widget"
-version = "1.0.0"
-updated_at = 1788482725
+version = "1.0.1"
+updated_at = 1788533941
 added_at = 1788482725
 author = "MezoAhmedII"
 license = "MIT"
