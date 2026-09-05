@@ -392,11 +392,18 @@ local function publishDevices(printers)
         if queuedAs == nil and d.model ~= "" then
           queuedAs = queuedNames[foldName(d.model)]
         end
+        local suggested = queuedAs
+        if suggested == nil then
+          -- Reserve the derived name, so two unqueued devices that fold to the
+          -- same base are offered distinct names rather than both claiming it.
+          suggested = queueNameFor(d, taken)
+          taken[suggested] = true
+        end
         table.insert(rows, {
           uri = d.uri,
           info = d.info ~= "" and d.info or d.uri,
           model = d.model,
-          suggestedName = queuedAs or queueNameFor(d, taken),
+          suggestedName = suggested,
           alreadyQueued = queuedAs ~= nil,
           queuedAs = queuedAs or "",
         })
