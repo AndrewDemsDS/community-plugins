@@ -2172,3 +2172,16 @@ icon = "book"
 description = "A Noctalia widget to show a random Quranic Ayah/verse on the desktop"
 plugin_api = 3
 tags = ["desktop", "utility"]
+
+[[plugin]]
+id = "ashur-d/nvim-projects"
+name = "Neovim Projects"
+version = "1.0.0"
+updated_at = 1788572460
+added_at = 1788572460
+author = "Ashur-D"
+license = "MIT"
+icon = "nvim"
+description = "Quickly search and open recent Neovim projects. Type /nvim in the launcher."
+plugin_api = 3
+tags = ["launcher", "development", "productivity"]
