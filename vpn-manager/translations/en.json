@@ -1,0 +1,28 @@
+{
+  "settings": {
+    "auto_connect_enabled": {
+      "label": "Auto-connect on untrusted networks",
+      "description": "When enabled, connects your default VPN whenever you join a Wi-Fi or Ethernet network that isn't in your trusted list."
+    },
+    "auto_disconnect_on_trusted": {
+      "label": "Auto-disconnect on trusted networks",
+      "description": "When enabled, disconnects a VPN this plugin auto-started once you're back on a trusted network. Never touches a VPN you started manually."
+    },
+    "trust_all_ethernet": {
+      "label": "Treat any wired connection as trusted",
+      "description": "Wired Ethernet is treated as trusted even if its connection name isn't in your trusted list. Turn this off if you plug into untrusted wired networks."
+    },
+    "notify_on_autoswitch": {
+      "label": "Notify on automatic connect/disconnect",
+      "description": "Show a notification whenever the VPN is automatically connected or disconnected."
+    },
+    "poll_interval_seconds": {
+      "label": "Check interval (seconds)",
+      "description": "How often to check VPN and network status."
+    },
+    "stable_checks": {
+      "label": "Stable checks before switching",
+      "description": "How many consecutive checks a network change must persist before auto-connect/disconnect reacts. Higher values avoid flapping during Wi-Fi roaming."
+    }
+  }
+}
