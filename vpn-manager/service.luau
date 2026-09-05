@@ -383,6 +383,19 @@ local function deleteUuid(uuid)
   end)
 end
 
+-- An import can fail after the panel has closed (the picker closes it), so a
+-- toast is the only thing the user sees and it is gone in seconds. Record the
+-- failure too, and the panel shows it the next time it is opened.
+local function importFailed(reason, path)
+  noctalia.state.set("vpn.lastImport", {
+    ok = false,
+    reason = reason,
+    path = path or "",
+    at = os.time(),
+  })
+  noctalia.notifyError(noctalia.tr("notifications.import_failed"), reason)
+end
+
 local function finishImport(path, typeArg, isTemp)
   local function cleanup()
     if isTemp then
@@ -392,10 +405,7 @@ local function finishImport(path, typeArg, isTemp)
 
   local function doImport(resolvedType)
     if resolvedType == nil then
-      noctalia.notifyError(
-        noctalia.tr("notifications.import_failed"),
-        noctalia.tr("notifications.detect_failed")
-      )
+      importFailed(noctalia.tr("notifications.detect_failed"), path)
       cleanup()
       return
     end
@@ -403,7 +413,7 @@ local function finishImport(path, typeArg, isTemp)
       cleanup()
       log(`import result exitCode={result.exitCode} stdout={result.stdout:gsub("\n", "\\n")} stderr={result.stderr:gsub("\n", "\\n")}`)
       if result.exitCode ~= 0 then
-        noctalia.notifyError(noctalia.tr("notifications.import_failed"), firstLine(result.stderr) .. packageHintFor(resolvedType))
+        importFailed(firstLine(result.stderr) .. packageHintFor(resolvedType), path)
         return
       end
       -- Newly imported connections default to autoconnect=yes (NM connects them at
@@ -415,6 +425,7 @@ local function finishImport(path, typeArg, isTemp)
       if newUuid ~= nil then
         run({ "nmcli", "connection", "modify", "uuid", newUuid, "connection.autoconnect", "no" }, function() end)
       end
+      noctalia.state.set("vpn.lastImport", { ok = true, reason = "", path = "", at = os.time() })
       noctalia.notify(noctalia.tr("title"), noctalia.tr("notifications.imported", { name = newName or noctalia.tr("notifications.a_connection") }))
       refreshAll()
     end, 20000)
@@ -431,12 +442,12 @@ end
 local function importFromPath(path, typeArg)
   path = trim(path)
   if path == "" then
-    noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.no_path"))
+    importFailed(noctalia.tr("notifications.no_path"), "")
     return
   end
   path = noctalia.expandPath(path)
   if not noctalia.fileExists(path) then
-    noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.file_not_found", { path = path }))
+    importFailed(noctalia.tr("notifications.file_not_found", { path = path }), path)
     return
   end
   finishImport(path, typeArg, false)
@@ -444,7 +455,7 @@ end
 
 local function importFromText(text, typeArg)
   if type(text) ~= "string" or trim(text) == "" then
-    noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.no_paste"))
+    importFailed(noctalia.tr("notifications.no_paste"), "")
     return
   end
   -- Deliberately not logged: a pasted config carries private keys, PSKs and
@@ -452,13 +463,13 @@ local function importFromText(text, typeArg)
   log(`importFromText received {#text} bytes`)
   local dir = noctalia.pluginDataDir()
   if dir == nil then
-    noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.no_data_dir"))
+    importFailed(noctalia.tr("notifications.no_data_dir"), "")
     return
   end
   local tmpPath = dir .. "/import-" .. tostring(math.floor(noctalia.nowMs())) .. ".tmp"
   local ok = noctalia.writeFile(tmpPath, text)
   if not ok then
-    noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.write_failed"))
+    importFailed(noctalia.tr("notifications.write_failed"), "")
     return
   end
   finishImport(tmpPath, typeArg, true)
@@ -858,4 +869,5 @@ noctalia.state.set("vpn.status", { anyActive = false, activeNames = {} })
 noctalia.state.set("vpn.currentNetworks", {})
 noctalia.state.set("vpn.details", { uuid = "", rows = {} })
 noctalia.state.set("vpn.picking", false)
+noctalia.state.set("vpn.lastImport", { ok = true, reason = "", path = "", at = 0 })
 refreshAll()

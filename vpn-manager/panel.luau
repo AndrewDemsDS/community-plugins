@@ -23,6 +23,7 @@ local IMPORT_TYPES = {
 local importTypeIndex = 0
 local pathDraft = ""
 local picking = false
+local lastImport = { ok = true, reason = "", path = "", at = 0 }
 local pathKey = 0
 local pasteDraft = ""
 local pasteKey = 0
@@ -249,7 +250,41 @@ local function addSection()
     table.insert(protoRows, ui.row({ gap = 14 }, rowItems))
   end
 
-  return ui.column({ gap = 8, padding = 8, fill = "surface_variant/0.25", radius = 8 }, {
+  local banner = {}
+  if lastImport.ok == false and lastImport.reason ~= "" then
+    table.insert(banner, ui.column({ gap = 2, padding = 6, fill = "error/0.15", radius = 6 }, {
+      ui.row({ gap = 6, align = "center" }, {
+        ui.glyph({ name = "alert-triangle", size = 14, color = "error" }),
+        ui.label({
+          text = noctalia.tr("panel.import_failed"),
+          fontSize = 12,
+          fontWeight = "bold",
+          color = "error",
+          flexGrow = 1,
+        }),
+        ui.button({
+          glyph = "x",
+          variant = "ghost",
+          controlSize = "sm",
+          tooltip = noctalia.tr("panel.dismiss"),
+          onClick = function()
+            lastImport = { ok = true, reason = "", path = "", at = 0 }
+            render()
+          end,
+        }),
+      }),
+      ui.label({ text = lastImport.reason, fontSize = 11, color = "on_surface_variant", maxLines = 4 }),
+      ui.label({
+        text = lastImport.path ~= "" and lastImport.path or "",
+        fontSize = 10,
+        color = "on_surface_variant",
+        maxLines = 1,
+        visible = lastImport.path ~= "",
+      }),
+    }))
+  end
+
+  local body = {
     ui.row({ align = "center", justify = "space_between" }, {
       ui.label({ text = noctalia.tr("panel.add_vpn"), fontWeight = "bold", fontSize = 13, flexGrow = 1 }),
       ui.button({
@@ -319,7 +354,15 @@ local function addSection()
       color = "on_surface_variant",
       maxLines = 4,
     }),
-  })
+  }
+
+  -- A failed import is shown above the form, since the picker closes the panel
+  -- and the toast is long gone by the time the panel is reopened.
+  for _, node in ipairs(body) do
+    table.insert(banner, node)
+  end
+
+  return ui.column({ gap = 8, padding = 8, fill = "surface_variant/0.25", radius = 8 }, banner)
 end
 
 local function trustSection()
@@ -480,7 +523,10 @@ function onOpen(_context)
   pendingDeleteVpn = nil
   expandedUuid = nil
   details = { uuid = "", rows = {} }
-  showAdd = false
+  lastImport = noctalia.state.get("vpn.lastImport") or lastImport
+  -- Land on the import form when the last attempt failed, so the reason is
+  -- visible rather than lost with the toast.
+  showAdd = lastImport.ok == false
   connections = noctalia.state.get("vpn.connections") or {}
   trustedNetworks = noctalia.state.get("vpn.trustedNetworks") or {}
   currentNetworks = noctalia.state.get("vpn.currentNetworks") or {}
@@ -489,6 +535,21 @@ function onOpen(_context)
   noctalia.state.set("vpn.cmd", { op = "refresh" })
   render()
 end
+
+noctalia.state.watch("vpn.lastImport", function(value)
+  if type(value) == "table" then
+    lastImport = {
+      ok = value.ok ~= false,
+      reason = type(value.reason) == "string" and value.reason or "",
+      path = type(value.path) == "string" and value.path or "",
+      at = tonumber(value.at) or 0,
+    }
+    if not lastImport.ok then
+      showAdd = true
+    end
+  end
+  render()
+end)
 
 noctalia.state.watch("vpn.picking", function(value)
   picking = value == true

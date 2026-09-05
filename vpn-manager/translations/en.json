@@ -68,7 +68,9 @@
     "trust_add": "Add this network to the trusted list",
     "expand": "Show trusted networks",
     "collapse": "Hide trusted networks",
-    "browse": "Choose a file and import it"
+    "browse": "Choose a file and import it",
+    "import_failed": "Import failed",
+    "dismiss": "Dismiss"
   },
   "notifications": {
     "connected_untrusted": "Untrusted network detected - connected {name}.",
