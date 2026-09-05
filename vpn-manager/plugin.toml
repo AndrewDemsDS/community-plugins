@@ -81,6 +81,10 @@ open_near_click = true
 # dismiss-on-outside-click the panel would vanish underneath it mid-task, so it
 # is closed deliberately instead: the X button, Escape, or the bar widget.
 dismiss_on_outside_click = false
+# ...but staying open must not mean holding an exclusive grab, or the picker
+# would be visible and unclickable. on_demand takes focus only when the panel
+# itself is used.
+keyboard_focus = "on_demand"
 
 [[shortcut]]
 id = "toggle"

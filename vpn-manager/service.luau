@@ -682,11 +682,13 @@ local function startFilePicker()
     return
   end
 
-  local picker
+  local picker, pickerBinary, pickerNeedle
   if noctalia.commandExists("kdialog") then
     picker = "kdialog --getopenfilename ~ '*.ovpn *.conf *.zip|VPN configurations'"
+    pickerBinary, pickerNeedle = "kdialog", "--getopenfilename"
   elseif noctalia.commandExists("zenity") then
     picker = "zenity --file-selection --title='Select a VPN configuration'"
+    pickerBinary, pickerNeedle = "zenity", "--file-selection"
   else
     noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.no_picker"))
     return
@@ -700,7 +702,7 @@ local function startFilePicker()
 
   local tmp = `{dir}/pick.tmp`
   noctalia.removeFile(tmp)
-  pendingPick = { path = tmp, started = os.time() }
+  pendingPick = { path = tmp, started = os.time(), binary = pickerBinary, needle = pickerNeedle, checking = false }
   noctalia.state.set("vpn.picking", true)
   noctalia.runAsync(`{picker} > {shellQuote(tmp)} 2>/dev/null &`)
 end
@@ -709,21 +711,46 @@ end
 -- being written back into the path field: one action, and the connection list
 -- updates in place. A cancelled picker writes nothing, so the wait is bounded
 -- either way.
+local function clearPick()
+  if pendingPick ~= nil then
+    noctalia.removeFile(pendingPick.path)
+    pendingPick = nil
+  end
+  noctalia.state.set("vpn.picking", false)
+end
+
 local function pollFilePicker()
   if pendingPick == nil then
     return
   end
+
   local raw = noctalia.readFile(pendingPick.path)
   if raw ~= nil and trim(raw) ~= "" then
     local path = trim(raw)
-    noctalia.removeFile(pendingPick.path)
-    pendingPick = nil
-    noctalia.state.set("vpn.picking", false)
+    clearPick()
     importFromPath(path, nil)
-  elseif os.time() - pendingPick.started > 180 then
-    noctalia.removeFile(pendingPick.path)
-    pendingPick = nil
-    noctalia.state.set("vpn.picking", false)
+    return
+  end
+
+  -- Cancelling writes nothing, so waiting for output alone would leave the
+  -- picker "in progress" until the timeout. Watch for the process going away
+  -- instead, and treat that as a cancel.
+  if not pendingPick.checking and os.time() - pendingPick.started >= 2 then
+    pendingPick.checking = true
+    local binary, needle = pendingPick.binary, pendingPick.needle
+    noctalia.processMatches(function(stillRunning)
+      if pendingPick ~= nil then
+        if stillRunning then
+          pendingPick.checking = false
+        else
+          clearPick()
+        end
+      end
+    end, binary, needle)
+  end
+
+  if os.time() - pendingPick.started > 120 then
+    clearPick()
   end
 end
 
