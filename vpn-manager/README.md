@@ -56,7 +56,7 @@ In the panel:
   typed in rather than a file - create those with `nmtui` and they'll appear
   in the list automatically.
 - **Trusted networks** - list of Wi-Fi SSIDs / Ethernet connection names
-  where the VPN should stay off. One-click "Trust '<name>'" buttons appear
+  where the VPN should stay off. One-click `Trust '<name>'` buttons appear
   for whatever network you're currently on.
 
 Open or close the panel with:
