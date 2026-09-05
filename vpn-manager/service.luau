@@ -576,6 +576,65 @@ end
 
 -- ── commands from panel / bar / shortcut ────────────────────────────────
 
+-- ── connection details and editing ───────────────────────────────────────
+
+-- NetworkManager UUIDs are hex and dashes. Validated before a UUID is ever
+-- interpolated into the terminal fallback below, which is the one place this
+-- plugin builds a shell string rather than an argv list.
+local function isUuid(value)
+  return type(value) == "string" and value:match("^[0-9a-fA-F%-]+$") ~= nil and #value >= 8
+end
+
+local DETAIL_FIELDS = "GENERAL.STATE,GENERAL.DEVICES,VPN.VPN-STATE,IP4.ADDRESS,IP4.GATEWAY,IP6.ADDRESS"
+
+-- nmcli returns indexed keys for repeatable fields ("IP4.ADDRESS[1]"), so the
+-- index is stripped before the label lookup.
+local DETAIL_LABELS = {
+  ["GENERAL.STATE"] = "state",
+  ["GENERAL.DEVICES"] = "device",
+  ["VPN.VPN-STATE"] = "vpn_state",
+  ["IP4.ADDRESS"] = "ipv4",
+  ["IP4.GATEWAY"] = "gateway",
+  ["IP6.ADDRESS"] = "ipv6",
+}
+
+local function fetchDetails(uuid)
+  if not isUuid(uuid) then
+    return
+  end
+  run({ "nmcli", "-t", "-f", DETAIL_FIELDS, "connection", "show", "--active", uuid }, function(result)
+    local rows = {}
+    for _, line in ipairs(splitLines(result.stdout)) do
+      local key, value = line:match("^([^:]+):(.*)$")
+      if key ~= nil then
+        local bare = key:gsub("%[%d+%]$", "")
+        local labelKey = DETAIL_LABELS[bare]
+        value = trim(value)
+        if labelKey ~= nil and value ~= "" then
+          table.insert(rows, { label = noctalia.tr(`panel.detail.{labelKey}`), value = value })
+        end
+      end
+    end
+    noctalia.state.set("vpn.details", { uuid = uuid, rows = rows })
+  end)
+end
+
+-- nm-connection-editor is the graphical editor; where it is not installed, fall
+-- back to nmtui-edit in a terminal. Neither is required for the plugin to work,
+-- so a box with neither just gets told so.
+local function editConnection(uuid)
+  if not isUuid(uuid) then
+    return
+  end
+  if noctalia.commandExists("nm-connection-editor") then
+    run({ "nm-connection-editor", "--edit=" .. uuid })
+  elseif noctalia.commandExists("nmtui-edit") then
+    noctalia.runInTerminal("nmtui-edit " .. uuid)
+  else
+    noctalia.notifyError(noctalia.tr("title"), noctalia.tr("notifications.no_editor"))
+  end
+end
+
 local function handleCommand(cmd)
   if type(cmd) ~= "table" then
     return
@@ -614,6 +673,10 @@ local function handleCommand(cmd)
     importFromPath(cmd.path, cmd.importType)
   elseif op == "importText" then
     importFromText(cmd.text, cmd.importType)
+  elseif op == "details" then
+    fetchDetails(cmd.uuid)
+  elseif op == "edit" then
+    editConnection(cmd.uuid)
   elseif op == "refresh" then
     refreshAll()
   end
@@ -669,4 +732,5 @@ publishAvailableProtocols()
 noctalia.state.set("vpn.connections", {})
 noctalia.state.set("vpn.status", { anyActive = false, activeNames = {} })
 noctalia.state.set("vpn.currentNetworks", {})
+noctalia.state.set("vpn.details", { uuid = "", rows = {} })
 refreshAll()

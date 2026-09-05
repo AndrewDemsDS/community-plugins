@@ -9,6 +9,8 @@ local defaultVpnUuid = ""
 local availableProtocols = {}
 
 local pendingDeleteVpn = nil
+local expandedUuid = nil
+local details = { uuid = "", rows = {} }
 
 local showAdd = false
 local IMPORT_TYPES = {
@@ -53,6 +55,44 @@ local function protocolBadge(available)
   })
 end
 
+local function detailsBlock(uuid, row)
+  local lines = {}
+  if not row.active then
+    table.insert(lines, ui.label({
+      text = noctalia.tr("panel.details_inactive"),
+      fontSize = 11,
+      color = "on_surface_variant",
+      maxLines = 2,
+    }))
+  elseif details.uuid ~= uuid or #details.rows == 0 then
+    table.insert(lines, ui.label({
+      text = noctalia.tr("panel.details_loading"),
+      fontSize = 11,
+      color = "on_surface_variant",
+    }))
+  else
+    for _, d in ipairs(details.rows) do
+      table.insert(lines, ui.row({ key = `detail-{uuid}-{d.label}`, gap = 6 }, {
+        ui.label({ text = d.label, fontSize = 11, color = "on_surface_variant", width = 70 }),
+        ui.label({ text = d.value, fontSize = 11, flexGrow = 1, maxLines = 1 }),
+      }))
+    end
+  end
+
+  table.insert(lines, ui.button({
+    key = "edit-" .. uuid,
+    text = noctalia.tr("panel.edit"),
+    glyph = "pencil",
+    variant = "outline",
+    controlSize = "sm",
+    onClick = function()
+      noctalia.state.set("vpn.cmd", { op = "edit", uuid = uuid })
+    end,
+  }))
+
+  return ui.column({ gap = 4, paddingH = 4 }, lines)
+end
+
 local function connectionRow(row)
   local uuid = row.uuid
   local deleting = pendingDeleteVpn == uuid
@@ -64,6 +104,7 @@ local function connectionRow(row)
         glyph = "check",
         variant = "destructive",
         controlSize = "sm",
+        tooltip = noctalia.tr("panel.delete_confirm", { name = row.name }),
         onClick = function()
           pendingDeleteVpn = nil
           noctalia.state.set("vpn.cmd", { op = "delete", uuid = uuid })
@@ -102,9 +143,27 @@ local function connectionRow(row)
         end,
       }),
       ui.button({
+        key = "info-" .. uuid,
+        glyph = expandedUuid == uuid and "chevron-up" or "info-circle",
+        variant = "ghost",
+        controlSize = "sm",
+        tooltip = noctalia.tr("panel.details"),
+        onClick = function()
+          if expandedUuid == uuid then
+            expandedUuid = nil
+          else
+            expandedUuid = uuid
+            details = { uuid = uuid, rows = {} }
+            noctalia.state.set("vpn.cmd", { op = "details", uuid = uuid })
+          end
+          render()
+        end,
+      }),
+      ui.button({
         glyph = "trash",
         variant = "ghost",
         controlSize = "sm",
+        tooltip = noctalia.tr("panel.delete"),
         onClick = function()
           pendingDeleteVpn = uuid
           render()
@@ -113,14 +172,9 @@ local function connectionRow(row)
     })
   end
 
-  return ui.row({
-    key = "vpn-" .. uuid,
+  local header = ui.row({
     gap = 8,
     align = "center",
-    paddingV = 6,
-    paddingH = 8,
-    fill = "surface_variant/0.35",
-    radius = 8,
   }, {
     statusDot(row.active, row.busy),
     ui.column({ flexGrow = 1, gap = 1 }, {
@@ -129,6 +183,20 @@ local function connectionRow(row)
     }),
     trailing,
   })
+
+  local children = { header }
+  if expandedUuid == uuid then
+    table.insert(children, detailsBlock(uuid, row))
+  end
+
+  return ui.column({
+    key = "vpn-" .. uuid,
+    gap = 6,
+    paddingV = 6,
+    paddingH = 8,
+    fill = "surface_variant/0.35",
+    radius = 8,
+  }, children)
 end
 
 local function connectionsSection()
@@ -246,6 +314,7 @@ local function trustSection()
       glyph = if showTrust then "chevron-up" else "chevron-down",
       variant = "ghost",
       controlSize = "sm",
+      tooltip = noctalia.tr(showTrust and "panel.collapse" or "panel.expand"),
       onClick = function()
         showTrust = not showTrust
         render()
@@ -319,7 +388,7 @@ local function trustSection()
       end,
       onSubmit = "onTrustAdd",
     }),
-    ui.button({ glyph = "plus", onClick = "onTrustAdd" }),
+    ui.button({ glyph = "plus", tooltip = noctalia.tr("panel.trust_add"), onClick = "onTrustAdd" }),
   }))
 
   return ui.column({ gap = 6 }, rows)
@@ -333,6 +402,7 @@ function render()
         glyph = "refresh",
         variant = "ghost",
         controlSize = "sm",
+        tooltip = noctalia.tr("panel.refresh"),
         onClick = function()
           noctalia.state.set("vpn.cmd", { op = "refresh" })
         end,
@@ -350,6 +420,7 @@ function render()
         glyph = "x",
         variant = "ghost",
         controlSize = "sm",
+        tooltip = noctalia.tr("panel.close"),
         onClick = function()
           panel.close()
         end,
@@ -392,6 +463,8 @@ end
 
 function onOpen(_context)
   pendingDeleteVpn = nil
+  expandedUuid = nil
+  details = { uuid = "", rows = {} }
   showAdd = false
   connections = noctalia.state.get("vpn.connections") or {}
   trustedNetworks = noctalia.state.get("vpn.trustedNetworks") or {}
@@ -401,6 +474,13 @@ function onOpen(_context)
   noctalia.state.set("vpn.cmd", { op = "refresh" })
   render()
 end
+
+noctalia.state.watch("vpn.details", function(value)
+  if type(value) == "table" then
+    details = { uuid = value.uuid or "", rows = type(value.rows) == "table" and value.rows or {} }
+  end
+  render()
+end)
 
 noctalia.state.watch("vpn.connections", function(value)
   connections = type(value) == "table" and value or {}

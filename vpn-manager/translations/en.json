@@ -47,7 +47,27 @@
     "trusted_none": "None yet. VPN auto-connect (if enabled in Settings) treats every network as untrusted until you add one.",
     "trust_current": "+ Trust '{name}'",
     "trust_placeholder": "SSID or Ethernet connection name",
-    "plugin_settings": "Plugin settings"
+    "plugin_settings": "Plugin settings",
+    "details": "Connection details",
+    "details_loading": "Reading connection details…",
+    "details_inactive": "Connect this VPN to see its address and device.",
+    "edit": "Edit connection",
+    "detail": {
+      "state": "State",
+      "device": "Device",
+      "vpn_state": "VPN state",
+      "ipv4": "IPv4",
+      "gateway": "Gateway",
+      "ipv6": "IPv6"
+    },
+    "delete": "Delete connection",
+    "delete_confirm": "Confirm deleting {name}",
+    "keep": "Keep it",
+    "refresh": "Refresh now",
+    "close": "Close",
+    "trust_add": "Add this network to the trusted list",
+    "expand": "Show trusted networks",
+    "collapse": "Hide trusted networks"
   },
   "notifications": {
     "connected_untrusted": "Untrusted network detected - connected {name}.",
@@ -68,6 +88,7 @@
     "write_failed": "Failed to write temporary file.",
     "install_hint": "Install '{package}' and try again.",
     "no_default": "No default VPN set. Open the VPN panel and tap the star on a connection first.",
-    "status_none": "No VPN connected"
+    "status_none": "No VPN connected",
+    "no_editor": "No connection editor found. Install nm-connection-editor or nmtui."
   }
 }
