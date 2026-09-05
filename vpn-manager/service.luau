@@ -665,6 +665,68 @@ local function editConnection(uuid)
   end
 end
 
+-- ── file picker ──────────────────────────────────────────────────────────
+
+-- A GUI picker outlives the runAsync call that spawns it, so it is detached
+-- with `&` and writes the chosen path to a temp file that update() consumes.
+-- This mirrors what other Noctalia plugins do for file selection.
+local pendingPick = nil -- { path = <tmp file>, started = <epoch seconds> }
+
+local function shellQuote(value)
+  return "'" .. tostring(value):gsub("'", "'\\''") .. "'"
+end
+
+local function startFilePicker()
+  if pendingPick ~= nil then
+    noctalia.notifyError(noctalia.tr("title"), noctalia.tr("notifications.pick_in_progress"))
+    return
+  end
+
+  local picker
+  if noctalia.commandExists("kdialog") then
+    picker = "kdialog --getopenfilename ~ '*.ovpn *.conf *.zip|VPN configurations'"
+  elseif noctalia.commandExists("zenity") then
+    picker = "zenity --file-selection --title='Select a VPN configuration'"
+  else
+    noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.no_picker"))
+    return
+  end
+
+  local dir = noctalia.pluginDataDir()
+  if dir == nil then
+    noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.no_data_dir"))
+    return
+  end
+
+  local tmp = `{dir}/pick.tmp`
+  noctalia.removeFile(tmp)
+  pendingPick = { path = tmp, started = os.time() }
+  noctalia.state.set("vpn.picking", true)
+  noctalia.runAsync(`{picker} > {shellQuote(tmp)} 2>/dev/null &`)
+end
+
+-- Called from update(). The chosen file is imported straight away rather than
+-- handed back to the panel: opening the picker moves focus, which dismisses the
+-- panel, so there is no form left to fill in by the time a path arrives.
+-- A cancelled picker writes nothing, so the wait is bounded either way.
+local function pollFilePicker()
+  if pendingPick == nil then
+    return
+  end
+  local raw = noctalia.readFile(pendingPick.path)
+  if raw ~= nil and trim(raw) ~= "" then
+    local path = trim(raw)
+    noctalia.removeFile(pendingPick.path)
+    pendingPick = nil
+    noctalia.state.set("vpn.picking", false)
+    importFromPath(path, nil)
+  elseif os.time() - pendingPick.started > 180 then
+    noctalia.removeFile(pendingPick.path)
+    pendingPick = nil
+    noctalia.state.set("vpn.picking", false)
+  end
+end
+
 local function handleCommand(cmd)
   if type(cmd) ~= "table" then
     return
@@ -703,6 +765,8 @@ local function handleCommand(cmd)
     importFromPath(cmd.path, cmd.importType)
   elseif op == "importText" then
     importFromText(cmd.text, cmd.importType)
+  elseif op == "pick" then
+    startFilePicker()
   elseif op == "details" then
     fetchDetails(cmd.uuid)
   elseif op == "edit" then
@@ -741,6 +805,8 @@ function onIpc(event, payload)
     log(`trusted={table.concat(data.trustedNetworks, ",")} default={data.defaultVpnUuid} autoStarted={data.autoStartedUuid}`)
   elseif event == "import" then
     importFromPath(payload, nil)
+  elseif event == "pick" then
+    startFilePicker()
   end
 end
 
@@ -750,6 +816,7 @@ end
 
 function update()
   tickCount += 1
+  pollFilePicker()
   local interval = cfgInt("poll_interval_seconds", 2, 60, 5)
   if tickCount % interval == 0 then
     refreshAll()
@@ -763,4 +830,5 @@ noctalia.state.set("vpn.connections", {})
 noctalia.state.set("vpn.status", { anyActive = false, activeNames = {} })
 noctalia.state.set("vpn.currentNetworks", {})
 noctalia.state.set("vpn.details", { uuid = "", rows = {} })
+noctalia.state.set("vpn.picking", false)
 refreshAll()

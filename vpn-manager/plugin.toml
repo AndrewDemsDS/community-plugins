@@ -13,7 +13,7 @@ license      = "MIT"
 icon         = "shield-lock"
 description  = "Connect, disconnect and import NetworkManager VPNs of any protocol, with auto-connect off trusted networks."
 tags         = ["bar", "panel", "service", "shortcut", "network", "privacy", "indicator"]
-dependencies = ["nmcli", "nm-connection-editor", "nmtui-edit"]
+dependencies = ["nmcli", "nm-connection-editor", "nmtui-edit", "kdialog", "zenity"]
 
 [[setting]]
 key = "auto_connect_enabled"

@@ -67,7 +67,8 @@
     "close": "Close",
     "trust_add": "Add this network to the trusted list",
     "expand": "Show trusted networks",
-    "collapse": "Hide trusted networks"
+    "collapse": "Hide trusted networks",
+    "browse": "Choose a file and import it"
   },
   "notifications": {
     "connected_untrusted": "Untrusted network detected - connected {name}.",
@@ -91,6 +92,8 @@
     "status_none": "No VPN connected",
     "no_editor": "No connection editor found. Install nm-connection-editor or nmtui.",
     "needs_secrets": "{name} needs a password and no secret agent is running. Save it with 'nmcli connection modify {name} vpn.secrets password=… vpn.data password-flags=0', or connect it by hand once.",
-    "asking_secrets": "{name} needs a password - asking for it in a terminal."
+    "asking_secrets": "{name} needs a password - asking for it in a terminal.",
+    "pick_in_progress": "A file picker is already open.",
+    "no_picker": "No file picker found. Install kdialog or zenity, or type the path."
   }
 }

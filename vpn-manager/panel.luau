@@ -22,6 +22,7 @@ local IMPORT_TYPES = {
 }
 local importTypeIndex = 0
 local pathDraft = ""
+local picking = false
 local pathKey = 0
 local pasteDraft = ""
 local pasteKey = 0
@@ -284,6 +285,15 @@ local function addSection()
         end,
         onSubmit = "onImportPath",
       }),
+      ui.button({
+        glyph = "folder-open",
+        variant = "outline",
+        tooltip = noctalia.tr("panel.browse"),
+        enabled = not picking,
+        onClick = function()
+          noctalia.state.set("vpn.cmd", { op = "pick" })
+        end,
+      }),
       ui.button({ text = noctalia.tr("panel.import"), onClick = "onImportPath" }),
     }),
     ui.label({ text = noctalia.tr("panel.or_paste"), fontSize = 11, color = "on_surface_variant" }),
@@ -474,6 +484,11 @@ function onOpen(_context)
   noctalia.state.set("vpn.cmd", { op = "refresh" })
   render()
 end
+
+noctalia.state.watch("vpn.picking", function(value)
+  picking = value == true
+  render()
+end)
 
 noctalia.state.watch("vpn.details", function(value)
   if type(value) == "table" then

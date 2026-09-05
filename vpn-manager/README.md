@@ -20,6 +20,10 @@ also needs its NetworkManager VPN plugin installed - see **How it works** below.
 back to `nmtui-edit` in a terminal otherwise. Neither is required: without them
 the button just reports that no editor was found.
 
+The file picker used by **Add VPN** is `kdialog`, falling back to `zenity`.
+Neither is required either - without them you can still type a path or paste the
+configuration text.
+
 ## How it works
 
 This plugin does not implement any VPN protocol itself. It drives `nmcli`,
@@ -60,8 +64,11 @@ In the panel:
   device, IPv4/IPv6 address and gateway, read live from `nmcli`. An inactive
   connection has none of that yet, so it says so. **Edit connection** opens the
   connection in a full editor.
-- **Add VPN** - import a `.ovpn`/WireGuard/vpnc/OpenConnect config from a
-  file path or pasted text. PPTP, L2TP/IPsec and IKEv2 generally need fields
+- **Add VPN** - import a `.ovpn`/WireGuard/vpnc/OpenConnect config. The folder
+  button opens a graphical file picker (`kdialog`, or `zenity`) and imports
+  whatever you choose; you can also type a path or paste the config text.
+  Opening the picker moves focus, which dismisses the panel - that is why the
+  chosen file is imported straight away rather than being handed back to a form. PPTP, L2TP/IPsec and IKEv2 generally need fields
   typed in rather than a file - create those with `nmtui` and they'll appear
   in the list automatically.
 - **Trusted networks** - list of Wi-Fi SSIDs / Ethernet connection names
@@ -107,6 +114,7 @@ noctalia msg plugin andrewdems/vpn-manager:service all status             # noti
 noctalia msg plugin andrewdems/vpn-manager:service all connect <uuid>     # connect one VPN by UUID
 noctalia msg plugin andrewdems/vpn-manager:service all disconnect <uuid>  # disconnect one VPN by UUID
 noctalia msg plugin andrewdems/vpn-manager:service all import <path>      # import a config file
+noctalia msg plugin andrewdems/vpn-manager:service all pick               # open a file picker and import what is chosen
 noctalia msg plugin andrewdems/vpn-manager:service all list               # log the known connections
 ```
 
