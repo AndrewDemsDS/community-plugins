@@ -66,13 +66,15 @@ In the panel:
   connection in a full editor.
 - **Add VPN** - import a `.ovpn`/WireGuard/vpnc/OpenConnect config. The folder
   button opens a graphical file picker (`kdialog`, or `zenity`) and imports
-  whatever you choose; you can also type a path or paste the config text.
+  whatever you choose; you can also type a path or paste the config text. PPTP,
+  L2TP/IPsec and IKEv2 generally need fields typed in rather than a file -
+  create those with `nmtui` and they'll appear in the list automatically.
 
-The panel does not close when you click outside it, because the file picker
-takes focus and the panel would otherwise vanish underneath it mid-import.
-Close it with the X button, Escape, or the bar widget. PPTP, L2TP/IPsec and IKEv2 generally need fields
-  typed in rather than a file - create those with `nmtui` and they'll appear
-  in the list automatically.
+  Opening the picker closes the panel. That is deliberate: the picker is a
+  separate window, and a panel left open underneath it holds a layer-shell grab
+  that would leave the picker visible but unclickable. The file you choose is
+  imported on its own, and appears in the connection list next time you open
+  the panel.
 - **Trusted networks** - list of Wi-Fi SSIDs / Ethernet connection names
   where the VPN should stay off. One-click `Trust '<name>'` buttons appear
   for whatever network you're currently on.

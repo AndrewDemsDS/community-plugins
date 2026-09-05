@@ -292,6 +292,11 @@ local function addSection()
         enabled = not picking,
         onClick = function()
           noctalia.state.set("vpn.cmd", { op = "pick" })
+          -- The picker is a separate window that takes focus; a panel left open
+          -- underneath it holds a layer-shell grab and the picker cannot be
+          -- clicked. Close deliberately, as other plugins do when they launch
+          -- something on top. The chosen file imports on its own.
+          panel.close()
         end,
       }),
       ui.button({ text = noctalia.tr("panel.import"), onClick = "onImportPath" }),
