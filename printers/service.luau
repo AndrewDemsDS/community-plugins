@@ -238,7 +238,10 @@ local function dedupeDevices(devices)
   local best = {}
   local order = {}
   for _, d in ipairs(devices) do
-    local key = d.model ~= "" and d.model or d.uri
+    -- `info` usually carries a bracketed serial ("HP ... [D692D5]") that `model`
+    -- does not, so keying on it (rather than the bare model name) keeps two
+    -- physical printers of the same model from collapsing into one row.
+    local key = d.info ~= "" and d.info or (d.model ~= "" and d.model or d.uri)
     d.rank = rankUri(d.uri)
     if best[key] == nil then
       best[key] = d
@@ -366,8 +369,9 @@ end
 
 -- Discoverable devices that are not already a queue, each with the name the
 -- panel would give it. lpinfo talks to the CUPS backends, so it is slower than
--- lpstat and is scanned on the same poll rather than on its own timer.
-local function publishDevices(printers)
+-- lpstat, and is only worth scanning while the panel's "Add a printer" section
+-- is actually open (see wantDevices()).
+local function publishDevices(printers, onDone)
   local taken = {}
   for _, p in ipairs(printers) do
     taken[p.name] = true
@@ -377,11 +381,19 @@ local function publishDevices(printers)
     local queuedUris = {}
     -- Folded queue names, as a fallback for a queue pointing at the same
     -- printer through a different URI than the one discovery reports (a
-    -- hand-made ipp:// queue against a dnssd:// advertisement, say).
+    -- hand-made ipp:// queue against a dnssd:// advertisement, say). A fold
+    -- that two different queue names collide on is marked false rather than
+    -- kept as one of them, so an ambiguous match reports "not queued" instead
+    -- of naming the wrong queue.
     local queuedNames = {}
     for name, uri in pairs(parseDeviceUris(uriResult.stdout)) do
       queuedUris[uri] = name
-      queuedNames[foldName(name)] = name
+      local key = foldName(name)
+      if queuedNames[key] == nil then
+        queuedNames[key] = name
+      elseif queuedNames[key] ~= name then
+        queuedNames[key] = false
+      end
     end
 
     run({ "lpinfo", "-l", "--include-schemes", "dnssd,ipp,ipps,socket,lpd,usb", "-v" }, function(result)
@@ -390,7 +402,10 @@ local function publishDevices(printers)
       for _, d in ipairs(devices) do
         local queuedAs = queuedUris[d.uri]
         if queuedAs == nil and d.model ~= "" then
-          queuedAs = queuedNames[foldName(d.model)]
+          local byName = queuedNames[foldName(d.model)]
+          if byName then
+            queuedAs = byName
+          end
         end
         local suggested = queuedAs
         if suggested == nil then
@@ -409,13 +424,36 @@ local function publishDevices(printers)
         })
       end
       noctalia.state.set("printer.devices", rows)
+      if onDone ~= nil then
+        onDone()
+      end
     end, 20000)
   end)
 end
 
+-- The panel sets this while "Add a printer" is expanded; scanning lpinfo on
+-- every poll regardless would burn CPU on DNS-SD/USB discovery nobody is
+-- looking at.
+local function wantDevices()
+  return noctalia.state.get("printer.wantDevices") == true
+end
+
 -- lpstat is called four times with plain argv rather than once behind a shell
 -- pipeline, so the plugin never needs /bin/sh.
+--
+-- refreshing guards against overlap: lpinfo's device scan can run for seconds,
+-- and without this a slow chain plus a poll tick (or a user action's own
+-- refresh) could start a second chain whose earlier completion publishes stale
+-- state over the newer one. A refresh that is skipped this way is never lost
+-- silently: the next poll tick, or the action that asked for it, still has a
+-- fresh CUPS state to report shortly after.
+local refreshing = false
+
 local function refresh()
+  if refreshing then
+    return
+  end
+  refreshing = true
   run({ "lpstat", "-d" }, function(defResult)
     local defaultPrinter = parseDefault(defResult.stdout)
     run({ "lpstat", "-p" }, function(printerResult)
@@ -426,7 +464,13 @@ local function refresh()
           local jobs = parseJobs(jobResult.stdout)
           notifyFaults(printers)
           publish(defaultPrinter, printers, jobs)
-          publishDevices(printers)
+          if wantDevices() then
+            publishDevices(printers, function()
+              refreshing = false
+            end)
+          else
+            refreshing = false
+          end
         end)
       end)
     end)
@@ -484,7 +528,10 @@ local function printClipboard()
     return
   end
 
-  local path = `{dir}/clipboard.txt`
+  -- Timestamped rather than a fixed name, so two overlapping "print clipboard"
+  -- calls (a double-click, or the panel and an IPC call landing together)
+  -- never race on the same file underneath each other's lp/removeFile.
+  local path = `{dir}/clipboard-{math.floor(noctalia.nowMs())}.txt`
   local ok, writeErr = noctalia.writeFile(path, text)
   if not ok then
     noctalia.notifyError(noctalia.tr("title"), writeErr or "could not stage the clipboard")
@@ -589,10 +636,16 @@ local function handleCommand(cmd)
   end
 end
 
-noctalia.state.watch("printer.cmd", function(cmd)
-  if cmd ~= nil then
-    handleCommand(cmd)
-    noctalia.state.set("printer.cmd", nil)
+-- printer.cmd holds a queue, not a single command: the panel appends to it
+-- rather than overwriting, so two commands sent in quick succession (cancel
+-- job A, then job B) are both delivered even if the watch callback only fires
+-- once for both writes, instead of the second silently replacing the first.
+noctalia.state.watch("printer.cmd", function(queue)
+  if type(queue) == "table" and #queue > 0 then
+    for _, cmd in ipairs(queue) do
+      handleCommand(cmd)
+    end
+    noctalia.state.set("printer.cmd", {})
   end
 end)
 
@@ -637,5 +690,6 @@ end
 noctalia.state.set("printer.printers", {})
 noctalia.state.set("printer.jobs", {})
 noctalia.state.set("printer.devices", {})
+noctalia.state.set("printer.cmd", {})
 noctalia.state.set("printer.status", { defaultPrinter = "", printerCount = 0, jobCount = 0, hasFault = false })
 refresh()

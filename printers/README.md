@@ -95,14 +95,17 @@ noctalia msg plugin andrewdems/printers:service all print-clipboard  # print the
 ## Notes
 
 - **Processes.** The service spawns `lpstat -d`, `lpstat -p`, `lpstat -e` and `lpstat -l -o`
-  on every poll, and `cancel`, `lpoptions -d`, `lp -d`, `xdg-open` or the configured
-  settings command when you use an action. Every one is spawned as an argv list,
-  never through a shell, so a printer or job name can never be interpreted as a
-  command.
-- **Files.** **Print clipboard** writes the clipboard text to `clipboard.txt` in
-  the plugin's data directory, passes that path to `lp`, and deletes it as soon
-  as `lp` returns. Nothing else is written, and the text never appears on a
-  command line.
+  on every poll, `lpstat -v` and `lpinfo` on every poll while "Add a printer" is
+  expanded (the discoverable-device scan is otherwise skipped, since nothing reads
+  it with the section collapsed), and `cancel`, `lpoptions -d`, `lp -d`, `xdg-open`
+  or the configured settings command when you use an action. Every one is spawned
+  as an argv list, never through a shell, so a printer or job name can never be
+  interpreted as a command.
+- **Files.** **Print clipboard** writes the clipboard text to a timestamped
+  `clipboard-<ms>.txt` in the plugin's data directory, passes that path to `lp`,
+  and deletes it as soon as `lp` returns. The timestamp keeps two overlapping
+  print requests from racing on the same file. Nothing else is written, and the
+  text never appears on a command line.
 - **Network.** The plugin makes no network requests of its own. `cups_url` is
   handed to `xdg-open`, which opens it in your browser.
 - **Privacy.** No printer name, host or queue is stored in the plugin. Names come

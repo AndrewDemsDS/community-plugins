@@ -12,8 +12,16 @@ local status = { defaultPrinter = "", printerCount = 0, jobCount = 0, hasFault =
 
 local pendingCancelAll = false
 
+-- Appends to the command queue rather than overwriting it, so two commands
+-- sent in quick succession (cancel job A, then job B) both reach the service
+-- instead of the second silently replacing the first.
 local function send(cmd)
-  noctalia.state.set("printer.cmd", cmd)
+  local queue = noctalia.state.get("printer.cmd")
+  if type(queue) ~= "table" then
+    queue = {}
+  end
+  table.insert(queue, cmd)
+  noctalia.state.set("printer.cmd", queue)
 end
 
 local function sectionLabel(text)
@@ -284,6 +292,9 @@ local function addSection()
         controlSize = "sm",
         onClick = function()
           showAdd = not showAdd
+          -- Tells the service it's worth scanning lpinfo on the next poll;
+          -- see wantDevices() in service.luau.
+          noctalia.state.set("printer.wantDevices", showAdd)
           if showAdd then
             send({ op = "refresh" })
           end
@@ -395,12 +406,18 @@ function onOpen(_context)
   pendingCancelAll = false
   pendingRemove = nil
   showAdd = false
+  noctalia.state.set("printer.wantDevices", false)
   devices = noctalia.state.get("printer.devices") or {}
   printers = noctalia.state.get("printer.printers") or {}
   jobs = noctalia.state.get("printer.jobs") or {}
   status = noctalia.state.get("printer.status") or status
   send({ op = "refresh" })
   render()
+end
+
+-- Stop the service scanning lpinfo once nobody can see the result.
+function onClose()
+  noctalia.state.set("printer.wantDevices", false)
 end
 
 noctalia.state.watch("printer.printers", function(value)
