@@ -268,7 +268,11 @@ local function addSection()
           controlSize = "sm",
           tooltip = noctalia.tr("panel.dismiss"),
           onClick = function()
+            -- Clear the shared record too, or onOpen reads the failure straight
+            -- back out of the service state and the banner returns.
             lastImport = { ok = true, reason = "", path = "", at = 0 }
+            noctalia.state.set("vpn.cmd", { op = "dismissImportError" })
+            showAdd = false
             render()
           end,
         }),
@@ -493,17 +497,25 @@ function render()
   }))
 end
 
+-- The select reports its own index; guard the lookup anyway, because a nil
+-- here would throw inside a UI callback and take the panel down with it.
+local function selectedImportType()
+  local entry = IMPORT_TYPES[importTypeIndex + 1]
+  local value = entry ~= nil and entry.value or ""
+  return value ~= "" and value or nil
+end
+
 function onImportPath()
-  local typeValue = IMPORT_TYPES[importTypeIndex + 1].value
-  noctalia.state.set("vpn.cmd", { op = "import", path = pathDraft, importType = typeValue ~= "" and typeValue or nil })
+  local typeValue = selectedImportType()
+  noctalia.state.set("vpn.cmd", { op = "import", path = pathDraft, importType = typeValue })
   pathDraft = ""
   pathKey += 1
   render()
 end
 
 function onImportPaste()
-  local typeValue = IMPORT_TYPES[importTypeIndex + 1].value
-  noctalia.state.set("vpn.cmd", { op = "importText", text = pasteDraft, importType = typeValue ~= "" and typeValue or nil })
+  local typeValue = selectedImportType()
+  noctalia.state.set("vpn.cmd", { op = "importText", text = pasteDraft, importType = typeValue })
   pasteDraft = ""
   pasteKey += 1
   render()

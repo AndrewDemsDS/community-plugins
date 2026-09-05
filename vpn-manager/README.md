@@ -121,6 +121,7 @@ noctalia msg plugin andrewdems/vpn-manager:service all connect <uuid>     # conn
 noctalia msg plugin andrewdems/vpn-manager:service all disconnect <uuid>  # disconnect one VPN by UUID
 noctalia msg plugin andrewdems/vpn-manager:service all import <path>      # import a config file
 noctalia msg plugin andrewdems/vpn-manager:service all pick               # open a file picker and import what is chosen
+noctalia msg plugin andrewdems/vpn-manager:service all dismiss-error      # clear a stuck import-failure banner
 noctalia msg plugin andrewdems/vpn-manager:service all list               # log the known connections
 ```
 

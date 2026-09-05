@@ -227,6 +227,11 @@ local refreshInFlight = false
 local opInFlight = {} -- uuid -> true while a connect/disconnect/delete is running
 local untrustedStreak = 0
 local trustedStreak = 0
+-- Auto-connect re-evaluates on every poll, so a VPN that cannot authenticate
+-- would be retried every few seconds and notify each time. A failed automatic
+-- attempt backs off until this timestamp.
+local autoConnectBlockedUntil = 0
+local AUTO_RETRY_BACKOFF_SECONDS = 300
 local tickCount = 0
 
 -- NetworkManager UUIDs are hex and dashes. Validated before a UUID is ever
@@ -309,6 +314,7 @@ local function connectUuid(uuid, isAuto)
   run({ "nmcli", "connection", "up", "uuid", uuid }, function(result)
     opInFlight[uuid] = nil
     if result.exitCode == 0 then
+      autoConnectBlockedUntil = 0
       if isAuto then
         data.autoStartedUuid = uuid
         saveData()
@@ -317,6 +323,9 @@ local function connectUuid(uuid, isAuto)
         end
       end
     else
+      if isAuto then
+        autoConnectBlockedUntil = os.time() + AUTO_RETRY_BACKOFF_SECONDS
+      end
       local name = nameForUuid(uuid) or noctalia.tr("title")
       if needsSecrets(result.stderr) then
         -- Auto-connect must not seize a terminal behind the user's back, so it
@@ -481,6 +490,9 @@ local function maybeAutoConnect()
   if not cfgBool("auto_connect_enabled", false) then
     return
   end
+  if os.time() < autoConnectBlockedUntil then
+    return
+  end
   local uuid = data.defaultVpnUuid
   if uuid == nil or uuid == "" then
     return
@@ -507,6 +519,23 @@ local function maybeAutoDisconnect()
   if uuid == nil or uuid == "" then
     return
   end
+
+  -- The VPN may already be down: it dropped, or it was disconnected outside
+  -- this plugin. Tearing down a connection that is not up makes nmcli fail and
+  -- would report an auto-disconnect failure that never happened, so just drop
+  -- the marker instead.
+  local active = false
+  for _, row in ipairs(lastVpnRows) do
+    if row.uuid == uuid then
+      active = row.active == true
+    end
+  end
+  if not active then
+    data.autoStartedUuid = ""
+    saveData()
+    return
+  end
+
   disconnectUuid(uuid, true)
 end
 
@@ -531,6 +560,8 @@ local function evaluateTrust(physicalRows)
   if anyTrusted then
     trustedStreak += 1
     untrustedStreak = 0
+    -- Back on a trusted network: the next untrusted one deserves a fresh try.
+    autoConnectBlockedUntil = 0
     if trustedStreak >= threshold then
       maybeAutoDisconnect()
     end
@@ -803,6 +834,8 @@ local function handleCommand(cmd)
     importFromPath(cmd.path, cmd.importType)
   elseif op == "importText" then
     importFromText(cmd.text, cmd.importType)
+  elseif op == "dismissImportError" then
+    noctalia.state.set("vpn.lastImport", { ok = true, reason = "", path = "", at = 0 })
   elseif op == "pick" then
     startFilePicker()
   elseif op == "details" then
@@ -845,6 +878,8 @@ function onIpc(event, payload)
     importFromPath(payload, nil)
   elseif event == "pick" then
     startFilePicker()
+  elseif event == "dismiss-error" then
+    noctalia.state.set("vpn.lastImport", { ok = true, reason = "", path = "", at = 0 })
   end
 end
 
