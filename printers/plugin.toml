@@ -3,7 +3,7 @@
 # the CUPS web interface. Everything is discovered from lpstat at runtime; no
 # printer name, host or queue is configured in the plugin.
 
-id           = "andrewdems/printer"
+id           = "andrewdems/printers"
 name         = "Printers"
 version      = "1.0.0"
 plugin_api   = 24

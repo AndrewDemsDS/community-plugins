@@ -40,7 +40,7 @@ noctalia.state.watch("printer.status", function(value)
 end)
 
 function onClick()
-  noctalia.togglePanel("andrewdems/printer:panel")
+  noctalia.togglePanel("andrewdems/printers:panel")
 end
 
 function onRightClick()

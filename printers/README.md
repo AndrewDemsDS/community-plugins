@@ -12,7 +12,7 @@ configure: whatever destinations CUPS knows about are the ones you see.
 
 | Field | Value |
 | --- | --- |
-| ID | `andrewdems/printer` |
+| ID | `andrewdems/printers` |
 | Entries | Bar widget: `printer`; panel: `panel`; service: `service`; shortcut: `toggle` |
 
 ## Requirements
@@ -32,7 +32,7 @@ tool, or ignore the button.
 
 ## Usage
 
-Add the **Printers** widget under Settings → Bar (or put `andrewdems/printer:printer`
+Add the **Printers** widget under Settings → Bar (or put `andrewdems/printers:printer`
 in a bar's widget list in `config.toml`). By default it appears only when there
 is a job in the queue or a printer has stopped; turn on **Always show the bar
 widget** to keep it pinned. The glyph turns red and switches to a struck-through
@@ -69,7 +69,7 @@ In the panel:
 Open or close the panel with:
 
 ```sh
-noctalia msg panel-toggle andrewdems/printer:panel
+noctalia msg panel-toggle andrewdems/printers:panel
 ```
 
 ## Settings
@@ -85,11 +85,11 @@ noctalia msg panel-toggle andrewdems/printer:panel
 ## IPC
 
 ```sh
-noctalia msg plugin andrewdems/printer:service all refresh          # re-poll now
-noctalia msg plugin andrewdems/printer:service all status           # notify with the default printer and job count
-noctalia msg plugin andrewdems/printer:service all cancel <job-id>  # cancel one job, e.g. Office_Laser-7
-noctalia msg plugin andrewdems/printer:service all cancel-all       # cancel every job
-noctalia msg plugin andrewdems/printer:service all print-clipboard  # print the clipboard on the default printer
+noctalia msg plugin andrewdems/printers:service all refresh          # re-poll now
+noctalia msg plugin andrewdems/printers:service all status           # notify with the default printer and job count
+noctalia msg plugin andrewdems/printers:service all cancel <job-id>  # cancel one job, e.g. Office_Laser-7
+noctalia msg plugin andrewdems/printers:service all cancel-all       # cancel every job
+noctalia msg plugin andrewdems/printers:service all print-clipboard  # print the clipboard on the default printer
 ```
 
 ## Notes
