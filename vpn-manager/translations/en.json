@@ -1,4 +1,9 @@
 {
+  "title": "VPN",
+  "tooltip": {
+    "connected": "VPN: {names}",
+    "disconnected": "VPN: disconnected"
+  },
   "settings": {
     "auto_connect_enabled": {
       "label": "Auto-connect on untrusted networks",
@@ -24,5 +29,45 @@
       "label": "Stable checks before switching",
       "description": "How many consecutive checks a network change must persist before auto-connect/disconnect reacts. Higher values avoid flapping during Wi-Fi roaming."
     }
+  },
+  "panel": {
+    "add_vpn": "Add VPN",
+    "auto_detect": "Auto-detect",
+    "protocol": "Protocol",
+    "import_from_file": "Import from file",
+    "path_placeholder": "~/Downloads/client.ovpn",
+    "import": "Import",
+    "or_paste": "or paste a config",
+    "paste_placeholder": "[Interface] / [Peer] for WireGuard, or full .ovpn contents",
+    "import_pasted": "Import Pasted Config",
+    "manual_note": "PPTP, L2TP/IPsec and IKEv2 usually need fields typed in rather than a file - create those with nmtui or nm-connection-editor and they'll appear above automatically.",
+    "no_connections": "No VPN connections yet. Import one below, or create one with nmtui and it will show up here.",
+    "use_as_default": "Use as auto-connect default",
+    "trusted_networks": "Trusted networks",
+    "trusted_none": "None yet. VPN auto-connect (if enabled in Settings) treats every network as untrusted until you add one.",
+    "trust_current": "+ Trust '{name}'",
+    "trust_placeholder": "SSID or Ethernet connection name",
+    "plugin_settings": "Plugin settings"
+  },
+  "notifications": {
+    "connected_untrusted": "Untrusted network detected - connected {name}.",
+    "connect_failed": "VPN connect failed",
+    "auto_connect_failed": "VPN auto-connect failed",
+    "disconnected_trusted": "Back on a trusted network - disconnected VPN.",
+    "disconnect_failed": "VPN disconnect failed",
+    "auto_disconnect_failed": "VPN auto-disconnect failed",
+    "delete_failed": "Could not delete VPN",
+    "import_failed": "Could not import VPN",
+    "detect_failed": "Couldn't detect the protocol. Pick one explicitly (OpenVPN, WireGuard, OpenConnect, vpnc) and try again.",
+    "imported": "Imported {name}.",
+    "a_connection": "connection",
+    "no_path": "Enter a file path first.",
+    "file_not_found": "File not found: {path}",
+    "no_paste": "Paste a config first.",
+    "no_data_dir": "No writable plugin data directory.",
+    "write_failed": "Failed to write temporary file.",
+    "install_hint": "Install '{package}' and try again.",
+    "no_default": "No default VPN set. Open the VPN panel and tap the star on a connection first.",
+    "status_none": "No VPN connected"
   }
 }

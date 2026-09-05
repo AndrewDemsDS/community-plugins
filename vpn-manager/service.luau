@@ -124,7 +124,7 @@ end
 local function packageHintFor(typeArg)
   local hint = PACKAGE_HINTS[typeArg]
   if hint ~= nil then
-    return ` Install '{hint}' and try again.`
+    return " " .. noctalia.tr("notifications.install_hint", { package = hint })
   end
   return ""
 end
@@ -289,7 +289,7 @@ local function connectUuid(uuid, isAuto)
         data.autoStartedUuid = uuid
         saveData()
         if cfgBool("notify_on_autoswitch", true) then
-          noctalia.notify("VPN", `Untrusted network detected - connected {nameForUuid(uuid) or "VPN"}.`)
+          noctalia.notify(noctalia.tr("title"), noctalia.tr("notifications.connected_untrusted", { name = nameForUuid(uuid) or noctalia.tr("title") }))
         end
       end
     else
@@ -297,7 +297,7 @@ local function connectUuid(uuid, isAuto)
       if msg:match("Secrets were required") then
         msg = msg .. " Open it once in nmtui or nm-connection-editor to save the password, then it will connect automatically."
       end
-      noctalia.notifyError(isAuto and "VPN auto-connect failed" or "VPN connect failed", msg)
+      noctalia.notifyError(noctalia.tr(isAuto and "notifications.auto_connect_failed" or "notifications.connect_failed"), msg)
     end
     refreshAll()
   end, 25000)
@@ -317,10 +317,10 @@ local function disconnectUuid(uuid, isAuto)
     end
     if result.exitCode == 0 then
       if isAuto and cfgBool("notify_on_autoswitch", true) then
-        noctalia.notify("VPN", "Back on a trusted network - disconnected VPN.")
+        noctalia.notify(noctalia.tr("title"), noctalia.tr("notifications.disconnected_trusted"))
       end
     else
-      noctalia.notifyError(isAuto and "VPN auto-disconnect failed" or "VPN disconnect failed", firstLine(result.stderr))
+      noctalia.notifyError(noctalia.tr(isAuto and "notifications.auto_disconnect_failed" or "notifications.disconnect_failed"), firstLine(result.stderr))
     end
     refreshAll()
   end, 25000)
@@ -332,7 +332,7 @@ local function deleteUuid(uuid)
   end
   run({ "nmcli", "connection", "delete", "uuid", uuid }, function(result)
     if result.exitCode ~= 0 then
-      noctalia.notifyError("Could not delete VPN", firstLine(result.stderr))
+      noctalia.notifyError(noctalia.tr("notifications.delete_failed"), firstLine(result.stderr))
     else
       if data.defaultVpnUuid == uuid then
         data.defaultVpnUuid = ""
@@ -356,8 +356,8 @@ local function finishImport(path, typeArg, isTemp)
   local function doImport(resolvedType)
     if resolvedType == nil then
       noctalia.notifyError(
-        "Could not import VPN",
-        "Couldn't detect the protocol. Pick one explicitly (OpenVPN, WireGuard, OpenConnect, vpnc) and try again."
+        noctalia.tr("notifications.import_failed"),
+        noctalia.tr("notifications.detect_failed")
       )
       cleanup()
       return
@@ -366,7 +366,7 @@ local function finishImport(path, typeArg, isTemp)
       cleanup()
       log(`import result exitCode={result.exitCode} stdout={result.stdout:gsub("\n", "\\n")} stderr={result.stderr:gsub("\n", "\\n")}`)
       if result.exitCode ~= 0 then
-        noctalia.notifyError("Could not import VPN", firstLine(result.stderr) .. packageHintFor(resolvedType))
+        noctalia.notifyError(noctalia.tr("notifications.import_failed"), firstLine(result.stderr) .. packageHintFor(resolvedType))
         return
       end
       -- Newly imported connections default to autoconnect=yes (NM connects them at
@@ -378,7 +378,7 @@ local function finishImport(path, typeArg, isTemp)
       if newUuid ~= nil then
         run({ "nmcli", "connection", "modify", "uuid", newUuid, "connection.autoconnect", "no" }, function() end)
       end
-      noctalia.notify("VPN", "Imported " .. (newName or "connection") .. ".")
+      noctalia.notify(noctalia.tr("title"), noctalia.tr("notifications.imported", { name = newName or noctalia.tr("notifications.a_connection") }))
       refreshAll()
     end, 20000)
   end
@@ -394,12 +394,12 @@ end
 local function importFromPath(path, typeArg)
   path = trim(path)
   if path == "" then
-    noctalia.notifyError("Could not import VPN", "Enter a file path first.")
+    noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.no_path"))
     return
   end
   path = noctalia.expandPath(path)
   if not noctalia.fileExists(path) then
-    noctalia.notifyError("Could not import VPN", "File not found: " .. path)
+    noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.file_not_found", { path = path }))
     return
   end
   finishImport(path, typeArg, false)
@@ -407,19 +407,19 @@ end
 
 local function importFromText(text, typeArg)
   if type(text) ~= "string" or trim(text) == "" then
-    noctalia.notifyError("Could not import VPN", "Paste a config first.")
+    noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.no_paste"))
     return
   end
   log(`importFromText received {#text} bytes: {text:gsub("\n", "\\n")}`)
   local dir = noctalia.pluginDataDir()
   if dir == nil then
-    noctalia.notifyError("Could not import VPN", "No writable plugin data directory.")
+    noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.no_data_dir"))
     return
   end
   local tmpPath = dir .. "/import-" .. tostring(math.floor(noctalia.nowMs())) .. ".tmp"
   local ok = noctalia.writeFile(tmpPath, text)
   if not ok then
-    noctalia.notifyError("Could not import VPN", "Failed to write temporary file.")
+    noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.write_failed"))
     return
   end
   finishImport(tmpPath, typeArg, true)
@@ -638,7 +638,7 @@ function onIpc(event, payload)
         table.insert(names, row.name)
       end
     end
-    noctalia.notify("VPN", #names > 0 and table.concat(names, ", ") or "No VPN connected")
+    noctalia.notify(noctalia.tr("title"), #names > 0 and table.concat(names, ", ") or noctalia.tr("notifications.status_none"))
   elseif event == "list" then
     for _, row in ipairs(lastVpnRows) do
       log(`conn name={row.name} type={row.ctype} protocol={row.protocol} uuid={row.uuid} active={tostring(row.active)}`)

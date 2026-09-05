@@ -5,7 +5,7 @@ local connected = false
 local defaultUuid = ""
 
 local function render()
-  shortcut.setLabel("VPN")
+  shortcut.setLabel(noctalia.tr("title"))
   shortcut.setIcon("shield-lock-filled", "shield-lock")
   shortcut.setActive(connected)
   shortcut.setEnabled(true)
@@ -22,7 +22,7 @@ end)
 
 function onClick()
   if defaultUuid == "" then
-    noctalia.notifyError("VPN", "No default VPN set. Open the VPN panel and tap the star on a connection first.")
+    noctalia.notifyError(noctalia.tr("title"), noctalia.tr("notifications.no_default"))
     noctalia.togglePanel("andrewdems/vpn-manager:panel")
     return
   end

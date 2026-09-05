@@ -12,7 +12,7 @@ local pendingDeleteVpn = nil
 
 local showAdd = false
 local IMPORT_TYPES = {
-  { label = "Auto-detect", value = "" },
+  { label = noctalia.tr("panel.auto_detect"), value = "" },
   { label = "OpenVPN (.ovpn)", value = "openvpn" },
   { label = "WireGuard (.conf)", value = "wireguard" },
   { label = "Cisco AnyConnect (openconnect)", value = "openconnect" },
@@ -85,7 +85,7 @@ local function connectionRow(row)
         glyph = if row.isDefault then "star-filled" else "star",
         variant = "ghost",
         controlSize = "sm",
-        tooltip = "Use as auto-connect default",
+        tooltip = noctalia.tr("panel.use_as_default"),
         onClick = function()
           noctalia.state.set("vpn.cmd", { op = "setDefault", uuid = if row.isDefault then "" else uuid })
         end,
@@ -135,7 +135,7 @@ local function connectionsSection()
   local rows = {}
   if #connections == 0 then
     table.insert(rows, ui.label({
-      text = "No VPN connections yet. Import one below, or create one with nmtui and it will show up here.",
+      text = noctalia.tr("panel.no_connections"),
       color = "on_surface_variant",
       fontSize = 12,
       maxLines = 3,
@@ -151,7 +151,7 @@ end
 local function addSection()
   if not showAdd then
     return ui.button({
-      text = "Add VPN",
+      text = noctalia.tr("panel.add_vpn"),
       glyph = "plus",
       variant = "outline",
       onClick = function()
@@ -182,7 +182,7 @@ local function addSection()
 
   return ui.column({ gap = 8, padding = 8, fill = "surface_variant/0.25", radius = 8 }, {
     ui.row({ align = "center", justify = "space_between" }, {
-      ui.label({ text = "Add VPN", fontWeight = "bold", fontSize = 13, flexGrow = 1 }),
+      ui.label({ text = noctalia.tr("panel.add_vpn"), fontWeight = "bold", fontSize = 13, flexGrow = 1 }),
       ui.button({
         glyph = "x",
         variant = "ghost",
@@ -194,7 +194,7 @@ local function addSection()
       }),
     }),
     ui.column({ gap = 4 }, protoRows),
-    ui.label({ text = "Protocol", fontSize = 11, color = "on_surface_variant" }),
+    ui.label({ text = noctalia.tr("panel.protocol"), fontSize = 11, color = "on_surface_variant" }),
     ui.select({
       key = "import-type",
       options = importTypeLabels(),
@@ -204,34 +204,34 @@ local function addSection()
         render()
       end,
     }),
-    ui.label({ text = "Import from file", fontSize = 11, color = "on_surface_variant" }),
+    ui.label({ text = noctalia.tr("panel.import_from_file"), fontSize = 11, color = "on_surface_variant" }),
     ui.row({ gap = 6, align = "center" }, {
       ui.input({
         key = "path-" .. pathKey,
         value = pathDraft,
-        placeholder = "~/Downloads/client.ovpn",
+        placeholder = noctalia.tr("panel.path_placeholder"),
         flexGrow = 1,
         onChange = function(value)
           pathDraft = value
         end,
         onSubmit = "onImportPath",
       }),
-      ui.button({ text = "Import", onClick = "onImportPath" }),
+      ui.button({ text = noctalia.tr("panel.import"), onClick = "onImportPath" }),
     }),
-    ui.label({ text = "or paste a config", fontSize = 11, color = "on_surface_variant" }),
+    ui.label({ text = noctalia.tr("panel.or_paste"), fontSize = 11, color = "on_surface_variant" }),
     ui.input({
       key = "paste-" .. pasteKey,
       value = pasteDraft,
-      placeholder = "[Interface] / [Peer] for WireGuard, or full .ovpn contents",
+      placeholder = noctalia.tr("panel.paste_placeholder"),
       multiline = true,
       height = 90,
       onChange = function(value)
         pasteDraft = value
       end,
     }),
-    ui.button({ text = "Import Pasted Config", variant = "primary", onClick = "onImportPaste" }),
+    ui.button({ text = noctalia.tr("panel.import_pasted"), variant = "primary", onClick = "onImportPaste" }),
     ui.label({
-      text = "PPTP, L2TP/IPsec and IKEv2 usually need fields typed in rather than a file - create those with nmtui or nm-connection-editor and they'll appear above automatically.",
+      text = noctalia.tr("panel.manual_note"),
       fontSize = 10,
       color = "on_surface_variant",
       maxLines = 4,
@@ -241,7 +241,7 @@ end
 
 local function trustSection()
   local header = ui.row({ align = "center", justify = "space_between" }, {
-    ui.label({ text = "Trusted networks", fontWeight = "bold", fontSize = 13, flexGrow = 1 }),
+    ui.label({ text = noctalia.tr("panel.trusted_networks"), fontWeight = "bold", fontSize = 13, flexGrow = 1 }),
     ui.button({
       glyph = if showTrust then "chevron-up" else "chevron-down",
       variant = "ghost",
@@ -260,7 +260,7 @@ local function trustSection()
   local rows = { header }
   if #trustedNetworks == 0 then
     table.insert(rows, ui.label({
-      text = "None yet. VPN auto-connect (if enabled in Settings) treats every network as untrusted until you add one.",
+      text = noctalia.tr("panel.trusted_none"),
       color = "on_surface_variant",
       fontSize = 11,
       maxLines = 3,
@@ -299,7 +299,7 @@ local function trustSection()
   for _, net in ipairs(untrustedCurrent) do
     table.insert(rows, ui.button({
       key = "add-current-" .. net.key,
-      text = "+ Trust '" .. net.key .. "'",
+      text = noctalia.tr("panel.trust_current", { name = net.key }),
       variant = "outline",
       controlSize = "sm",
       onClick = function()
@@ -312,7 +312,7 @@ local function trustSection()
     ui.input({
       key = "trust-add-" .. trustKey,
       value = trustDraft,
-      placeholder = "SSID or Ethernet connection name",
+      placeholder = noctalia.tr("panel.trust_placeholder"),
       flexGrow = 1,
       onChange = function(value)
         trustDraft = value
@@ -328,7 +328,7 @@ end
 function render()
   panel.render(ui.column({ flexGrow = 1, gap = 10, padding = 10 }, {
     ui.row({ align = "center", justify = "space_between" }, {
-      ui.label({ text = "VPN", fontSize = 16, fontWeight = "bold", flexGrow = 1 }),
+      ui.label({ text = noctalia.tr("title"), fontSize = 16, fontWeight = "bold", flexGrow = 1 }),
       ui.button({
         glyph = "refresh",
         variant = "ghost",
@@ -341,7 +341,7 @@ function render()
         glyph = "settings",
         variant = "ghost",
         controlSize = "sm",
-        tooltip = "Plugin settings",
+        tooltip = noctalia.tr("panel.plugin_settings"),
         onClick = function()
           noctalia.openSettings()
         end,

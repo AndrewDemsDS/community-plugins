@@ -13,9 +13,9 @@ local function render()
     barWidget.setColor("on_surface_variant")
   end
   if connected and #activeNames > 0 then
-    barWidget.setTooltip("VPN: " .. table.concat(activeNames, ", "))
+    barWidget.setTooltip(noctalia.tr("tooltip.connected", { names = table.concat(activeNames, ", ") }))
   else
-    barWidget.setTooltip("VPN: disconnected")
+    barWidget.setTooltip(noctalia.tr("tooltip.disconnected"))
   end
 end
 
