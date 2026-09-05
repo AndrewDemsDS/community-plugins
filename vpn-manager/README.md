@@ -16,6 +16,10 @@ bar widget and panel, the same way `nm-applet`/`nmtui` do.
 NetworkManager, providing `nmcli` on `PATH`. Any VPN protocol you want to use
 also needs its NetworkManager VPN plugin installed - see **How it works** below.
 
+**Edit connection** opens `nm-connection-editor` when it is installed, and falls
+back to `nmtui-edit` in a terminal otherwise. Neither is required: without them
+the button just reports that no editor was found.
+
 ## How it works
 
 This plugin does not implement any VPN protocol itself. It drives `nmcli`,
@@ -50,7 +54,12 @@ open the panel.
 In the panel:
 
 - **Connections** - toggle to connect/disconnect, star to mark as the
-  auto-connect default, trash to delete.
+  auto-connect default, the info button to expand the connection's details, and
+  trash to delete (which asks first).
+- **Connection details** - expanding an active connection shows its state,
+  device, IPv4/IPv6 address and gateway, read live from `nmcli`. An inactive
+  connection has none of that yet, so it says so. **Edit connection** opens the
+  connection in a full editor.
 - **Add VPN** - import a `.ovpn`/WireGuard/vpnc/OpenConnect config from a
   file path or pasted text. PPTP, L2TP/IPsec and IKEv2 generally need fields
   typed in rather than a file - create those with `nmtui` and they'll appear
