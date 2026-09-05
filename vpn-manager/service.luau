@@ -410,7 +410,9 @@ local function importFromText(text, typeArg)
     noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.no_paste"))
     return
   end
-  log(`importFromText received {#text} bytes: {text:gsub("\n", "\\n")}`)
+  -- Deliberately not logged: a pasted config carries private keys, PSKs and
+  -- certificates, and the shell log is a world-readable file on disk.
+  log(`importFromText received {#text} bytes`)
   local dir = noctalia.pluginDataDir()
   if dir == nil then
     noctalia.notifyError(noctalia.tr("notifications.import_failed"), noctalia.tr("notifications.no_data_dir"))
