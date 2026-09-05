@@ -74,7 +74,9 @@ In the panel:
   separate window, and a panel left open underneath it holds a layer-shell grab
   that would leave the picker visible but unclickable. The file you choose is
   imported on its own, and appears in the connection list next time you open
-  the panel.
+  the panel. If the import fails, the panel reopens on this form with the
+  reason and the file that failed, so you can pick a protocol explicitly and
+  retry.
 - **Trusted networks** - list of Wi-Fi SSIDs / Ethernet connection names
   where the VPN should stay off. One-click `Trust '<name>'` buttons appear
   for whatever network you're currently on.
