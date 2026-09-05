@@ -67,8 +67,10 @@ In the panel:
 - **Add VPN** - import a `.ovpn`/WireGuard/vpnc/OpenConnect config. The folder
   button opens a graphical file picker (`kdialog`, or `zenity`) and imports
   whatever you choose; you can also type a path or paste the config text.
-  Opening the picker moves focus, which dismisses the panel - that is why the
-  chosen file is imported straight away rather than being handed back to a form. PPTP, L2TP/IPsec and IKEv2 generally need fields
+
+The panel does not close when you click outside it, because the file picker
+takes focus and the panel would otherwise vanish underneath it mid-import.
+Close it with the X button, Escape, or the bar widget. PPTP, L2TP/IPsec and IKEv2 generally need fields
   typed in rather than a file - create those with `nmtui` and they'll appear
   in the list automatically.
 - **Trusted networks** - list of Wi-Fi SSIDs / Ethernet connection names

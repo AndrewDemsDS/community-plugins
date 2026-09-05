@@ -706,9 +706,9 @@ local function startFilePicker()
 end
 
 -- Called from update(). The chosen file is imported straight away rather than
--- handed back to the panel: opening the picker moves focus, which dismisses the
--- panel, so there is no form left to fill in by the time a path arrives.
--- A cancelled picker writes nothing, so the wait is bounded either way.
+-- being written back into the path field: one action, and the connection list
+-- updates in place. A cancelled picker writes nothing, so the wait is bounded
+-- either way.
 local function pollFilePicker()
   if pendingPick == nil then
     return
