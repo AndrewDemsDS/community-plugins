@@ -115,10 +115,25 @@ UUIDs are the ones `nmcli connection show` prints.
 ## Notes
 
 - Secrets (passwords, PSKs) are never touched by this plugin - it only
-  passes UUIDs to `nmcli`. A connection that needs an interactive secret and
-  has none stored will fail to connect headlessly; open it once in `nmtui`
-  or `nm-connection-editor`, save the password, and `nmcli connection up`
-  (and this plugin) will work from then on.
+  passes UUIDs to `nmcli`. A connection whose password is marked *agent-owned*
+  (`password-flags = 1`) needs a NetworkManager **secret agent** to supply it;
+  without one, NetworkManager reports `No valid secrets` and activation fails
+  before the VPN process starts. Desktop environments ship an agent
+  (`nm-applet`, GNOME Shell, plasma-nm); a bare Wayland session often has none.
+
+  When a connect fails that way, this plugin reruns it as
+  `nmcli --ask connection up uuid <uuid>` in a terminal so you can type the
+  password. Auto-connect never does this - it will not seize a terminal
+  unprompted - and reports the problem instead.
+
+  To stop being asked at all, store the password in the connection:
+
+  ```sh
+  nmcli connection modify <name> vpn.secrets password=<password> vpn.data password-flags=0
+  ```
+
+  NetworkManager then keeps it in the connection file (root-readable only) and
+  the VPN connects headlessly from then on.
 - Pasted/imported config text is written to a temporary file under the
   plugin's data directory only for the duration of the `nmcli connection
   import` call, then deleted immediately (success or failure) so secrets

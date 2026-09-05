@@ -89,6 +89,8 @@
     "install_hint": "Install '{package}' and try again.",
     "no_default": "No default VPN set. Open the VPN panel and tap the star on a connection first.",
     "status_none": "No VPN connected",
-    "no_editor": "No connection editor found. Install nm-connection-editor or nmtui."
+    "no_editor": "No connection editor found. Install nm-connection-editor or nmtui.",
+    "needs_secrets": "{name} needs a password and no secret agent is running. Save it with 'nmcli connection modify {name} vpn.secrets password=… vpn.data password-flags=0', or connect it by hand once.",
+    "asking_secrets": "{name} needs a password - asking for it in a terminal."
   }
 }

@@ -229,6 +229,30 @@ local untrustedStreak = 0
 local trustedStreak = 0
 local tickCount = 0
 
+-- NetworkManager UUIDs are hex and dashes. Validated before a UUID is ever
+-- interpolated into a terminal command, the only place this plugin builds a
+-- shell string rather than an argv list.
+local function isUuid(value)
+  return type(value) == "string" and value:match("^[0-9a-fA-F%-]+$") ~= nil and #value >= 8
+end
+
+-- NetworkManager asks a secret agent for a password whose flags mark it
+-- agent-owned. A bare shell has no agent, so activation fails before OpenVPN
+-- even starts; nmcli --ask asks on the terminal instead.
+local function needsSecrets(stderr)
+  local text = tostring(stderr or ""):lower()
+  return text:find("no valid secrets") ~= nil
+    or text:find("secrets were required") ~= nil
+    or text:find("no agents were available") ~= nil
+end
+
+local function promptForSecrets(uuid)
+  if not isUuid(uuid) then
+    return false
+  end
+  return noctalia.runInTerminal(`nmcli --ask connection up uuid {uuid}`)
+end
+
 local function nameForUuid(uuid)
   for _, row in ipairs(lastVpnRows) do
     if row.uuid == uuid then
@@ -293,11 +317,24 @@ local function connectUuid(uuid, isAuto)
         end
       end
     else
-      local msg = firstLine(result.stderr)
-      if msg:match("Secrets were required") then
-        msg = msg .. " Open it once in nmtui or nm-connection-editor to save the password, then it will connect automatically."
+      local name = nameForUuid(uuid) or noctalia.tr("title")
+      if needsSecrets(result.stderr) then
+        -- Auto-connect must not seize a terminal behind the user's back, so it
+        -- only says what is wrong; a deliberate connect gets the prompt.
+        if isAuto or not promptForSecrets(uuid) then
+          noctalia.notifyError(
+            noctalia.tr("notifications.connect_failed"),
+            noctalia.tr("notifications.needs_secrets", { name = name })
+          )
+        else
+          noctalia.notify(noctalia.tr("title"), noctalia.tr("notifications.asking_secrets", { name = name }))
+        end
+      else
+        noctalia.notifyError(
+          noctalia.tr(isAuto and "notifications.auto_connect_failed" or "notifications.connect_failed"),
+          firstLine(result.stderr)
+        )
       end
-      noctalia.notifyError(noctalia.tr(isAuto and "notifications.auto_connect_failed" or "notifications.connect_failed"), msg)
     end
     refreshAll()
   end, 25000)
@@ -577,13 +614,6 @@ end
 -- ── commands from panel / bar / shortcut ────────────────────────────────
 
 -- ── connection details and editing ───────────────────────────────────────
-
--- NetworkManager UUIDs are hex and dashes. Validated before a UUID is ever
--- interpolated into the terminal fallback below, which is the one place this
--- plugin builds a shell string rather than an argv list.
-local function isUuid(value)
-  return type(value) == "string" and value:match("^[0-9a-fA-F%-]+$") ~= nil and #value >= 8
-end
 
 local DETAIL_FIELDS = "GENERAL.STATE,GENERAL.DEVICES,VPN.VPN-STATE,IP4.ADDRESS,IP4.GATEWAY,IP6.ADDRESS"
 
