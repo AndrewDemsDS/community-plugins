@@ -2237,3 +2237,16 @@ icon = "link"
 description = "Bar widget showing whether the sing-box proxy daemon is running."
 plugin_api = 3
 tags = ["bar", "network"]
+
+[[plugin]]
+id = "zyrex/run-path"
+name = "Run / Open Path"
+version = "1.0.0"
+updated_at = 1788711462
+added_at = 1788711462
+author = "zyrex"
+license = "MIT"
+icon = "folder-open"
+description = "Type a path in the launcher to open it, with live completion, or type anything else to run it as a command."
+plugin_api = 3
+tags = ["launcher", "utility", "productivity"]
