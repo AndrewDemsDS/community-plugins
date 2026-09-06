@@ -2269,3 +2269,16 @@ icon = "headphones"
 description = "Mix looping ambient sounds from a Noctalia panel, bar widget, or shortcut."
 plugin_api = 24
 tags = ["audio", "media", "bar", "panel", "shortcut"]
+
+[[plugin]]
+id = "alitura1/ayet-kosesi"
+name = "Ayet Köşesi"
+version = "1.0.0"
+updated_at = 1788733836
+added_at = 1788733836
+author = "alitura1"
+license = "MIT"
+icon = "book"
+description = "Akıl Kuran'dan günlük ayeti masaüstünde gösteren Noctalia eklentisi."
+plugin_api = 24
+tags = ["desktop", "time", "utility"]
