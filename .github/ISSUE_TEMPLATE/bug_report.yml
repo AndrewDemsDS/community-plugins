@@ -144,6 +144,7 @@ body:
         - sharednd
         - shell-command
         - shelly
+        - sing-box-status
         - special-workspaces
         - spotify
         - spotify-lyrics
