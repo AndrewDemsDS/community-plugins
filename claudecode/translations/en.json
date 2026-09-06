@@ -1,109 +1,109 @@
 {
-  "title": "Claude Code Usage",
-  "used": "used",
-  "resets_in": "Resets in",
-  "resetting": "Resetting…",
-  "token_consumption": "Token Consumption",
-  "today": "Today",
-  "week": "Week",
-  "month": "Month",
-  "daily_activity": "Daily Activity",
-  "models_this_week": "Models This Week",
-  "since": "Since",
-  "sessions": "sessions",
-  "msgs": "msgs",
-  "tokens": "tokens",
-  "all_time": "All-time",
   "all": "All",
-  "profile": "Profile",
-  "days": "Mo,Tu,We,Th,Fr,Sa,Su",
-  "refresh": "Refresh",
-  "refreshing": "Refreshing…",
-  "settings_tooltip": "Plugin settings",
+  "all_time": "All-time",
   "close": "Close",
-  "loading": "Claude Code Usage — loading…",
-  "unavailable": "Claude Code Usage unavailable",
-  "day_detail": "{day} · {tokens} tokens · {cost}",
-  "pace": {
-    "under": "under pace",
-    "over": "over pace",
-    "on": "On pace",
-    "over_quota": "Over quota"
-  },
   "currency": {
     "auto_default": "usd"
   },
+  "daily_activity": "Daily Activity",
+  "day_detail": "{day} · {tokens} tokens · {cost}",
+  "days": "Mo,Tu,We,Th,Fr,Sa,Su",
+  "loading": "Claude Code Usage — loading…",
+  "models_this_week": "Models This Week",
+  "month": "Month",
+  "msgs": "msgs",
+  "pace": {
+    "on": "On pace",
+    "over": "over pace",
+    "over_quota": "Over quota",
+    "under": "under pace"
+  },
+  "plan": "Plan",
+  "profile": "Profile",
+  "rate_windows": "Rate Windows",
+  "refresh": "Refresh",
+  "refreshing": "Refreshing…",
+  "resets_in": "Resets in",
+  "resetting": "Resetting…",
+  "sessions": "sessions",
   "settings": {
-    "refresh_interval": {
-      "label": "Refresh interval",
-      "description": "How often to fetch usage data (minutes)."
+    "accent": {
+      "description": "Color for values, bars, and today's activity.",
+      "label": "Accent color"
     },
     "currency": {
-      "label": "Currency",
       "description": "Currency for displayed costs. Auto follows the interface language.",
+      "label": "Currency",
       "options": {
         "auto": "Auto",
-        "usd": "USD ($)",
-        "eur": "EUR (€)"
+        "eur": "EUR (€)",
+        "usd": "USD ($)"
+      }
+    },
+    "pill_extras": {
+      "description": "What to show beside the percentage. Describes the window the bar metric tracks (the 5-hour one under “Both”).",
+      "label": "Bar extras",
+      "options": {
+        "both": "Time left + pace",
+        "countdown": "Time left",
+        "none": "Nothing",
+        "pace": "Pace (↑/↓ points)"
       }
     },
     "pill_metric": {
-      "label": "Bar metric",
       "description": "Which rate window the bar pill shows.",
+      "label": "Bar metric",
       "options": {
+        "both": "Both (5h · 7d)",
         "five_hour": "5-hour window",
-        "seven_day": "7-day window",
-        "both": "Both (5h · 7d)"
+        "seven_day": "7-day window"
       }
     },
     "pill_style": {
-      "label": "Bar style",
       "description": "How the bar pill draws the utilization. The ring tracks the 5-hour window when the metric is “Both”.",
+      "label": "Bar style",
       "options": {
         "glyph_text": "Glyph + percentage",
         "ring": "Ring only",
         "ring_text": "Ring + percentage"
       }
     },
-    "pill_extras": {
-      "label": "Bar extras",
-      "description": "What to show beside the percentage. Describes the window the bar metric tracks (the 5-hour one under “Both”).",
-      "options": {
-        "none": "Nothing",
-        "countdown": "Time left",
-        "pace": "Pace (↑/↓ points)",
-        "both": "Time left + pace"
-      }
+    "refresh_interval": {
+      "description": "How often to fetch usage data (minutes).",
+      "label": "Refresh interval"
+    },
+    "ring_color": {
+      "description": "Used only when the palette cannot be read, as with built-in themes.",
+      "label": "Ring fallback color"
     },
     "ring_size": {
-      "label": "Ring size",
-      "description": "Ring diameter in pixels. Keep it under the bar height."
+      "description": "Ring diameter in pixels. Keep it under the bar height.",
+      "label": "Ring size"
     },
     "ring_thickness": {
       "label": "Ring thickness"
-    },
-    "ring_color": {
-      "label": "Ring fallback color",
-      "description": "Used only when the palette cannot be read, as with built-in themes."
     },
     "ring_track_color": {
       "label": "Ring track fallback color"
     },
     "show_glyph": {
-      "label": "Show glyph",
-      "description": "Only applies to the glyph + percentage style."
-    },
-    "accent": {
-      "label": "Accent color",
-      "description": "Color for values, bars, and today's activity."
+      "description": "Only applies to the glyph + percentage style.",
+      "label": "Show glyph"
     }
   },
+  "settings_tooltip": "Plugin settings",
+  "since": "Since",
+  "title": "Claude Code Usage",
+  "today": "Today",
+  "token_consumption": "Token Consumption",
+  "tokens": "tokens",
+  "unavailable": "Claude Code Usage unavailable",
+  "used": "used",
+  "week": "Week",
   "window": {
-    "session": "Session (5h)",
-    "weekly": "Weekly (7d)",
+    "other": "Rate window",
     "scoped": "{model} (7d)",
-    "other": "Rate window"
-  },
-  "plan": "Plan",
-  "rate_windows": "Rate Windows"
+    "session": "Session (5h)",
+    "weekly": "Weekly (7d)"
+  }
 }
