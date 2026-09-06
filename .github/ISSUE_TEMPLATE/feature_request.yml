@@ -140,6 +140,7 @@ body:
         - remmina
         - rss-notifier
         - ruh-vpn
+        - run-path
         - screen-toolkit
         - sharednd
         - shell-command
