@@ -2111,15 +2111,21 @@ tags = ["launcher", "bar", "panel", "network", "utility", "productivity"]
 [[plugin]]
 id = "tranzem/media-lyrics"
 name = "Media Lyrics"
-version = "0.9.0"
-updated_at = 1788658548
+version = "0.9.3"
+updated_at = 1788723654
 added_at = 1788381228
 author = "tranzem"
 license = "MIT"
 icon = "music"
 description = "Synced lyrics media panel: karaoke carousel, progress bar, marquee titles. Pure Luau; runtime needs busctl + curl."
-plugin_api = 24
+plugin_api = 30
 tags = ["media", "music", "panel", "service"]
+
+[[plugin.release]]
+plugin_api = 24
+version = "0.9.0"
+updated_at = 1788658548
+rev = "0a0222e0cf411e5bf4a2706508f9cc41272c2453"
 
 [[plugin]]
 id = "redxtech/super-productivity"
