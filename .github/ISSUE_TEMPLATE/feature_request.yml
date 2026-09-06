@@ -36,6 +36,7 @@ body:
         - asus-fans-controller-ec
         - audio-switcher
         - awwwall
+        - ayet-kosesi
         - battery-graph
         - battery-power-management
         - battery-threshold
