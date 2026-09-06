@@ -2250,3 +2250,16 @@ icon = "folder-open"
 description = "Type a path in the launcher to open it, with live completion, or type anything else to run it as a command."
 plugin_api = 3
 tags = ["launcher", "utility", "productivity"]
+
+[[plugin]]
+id = "reaperhound/ambient-sounds"
+name = "Ambient Sounds"
+version = "0.1.2"
+updated_at = 1788501369
+added_at = 1788501369
+author = "Reaper Hound"
+license = "MIT"
+icon = "headphones"
+description = "Mix looping ambient sounds from a Noctalia panel, bar widget, or shortcut."
+plugin_api = 24
+tags = ["audio", "media", "bar", "panel", "shortcut"]
