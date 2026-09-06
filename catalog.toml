@@ -542,8 +542,8 @@ rev = "ff289e523fb3dca794979dd3476d336642296463"
 [[plugin]]
 id = "kenn/keybind-cheatsheet"
 name = "Keybind Cheatsheet"
-version = "0.2.5"
-updated_at = 1788136844
+version = "0.2.6"
+updated_at = 1788657590
 added_at = 1784677847
 author = "kenn"
 license = "MIT"
