@@ -2282,3 +2282,16 @@ icon = "book"
 description = "Akıl Kuran'dan günlük ayeti masaüstünde gösteren Noctalia eklentisi."
 plugin_api = 24
 tags = ["desktop", "time", "utility"]
+
+[[plugin]]
+id = "jrohland/claudecode"
+name = "Claude Code Usage"
+version = "1.0.0"
+updated_at = 1788734110
+added_at = 1788734110
+author = "Nicolas Bellamy (Noctalia port by jrohland)"
+license = "MIT"
+icon = "robot"
+description = "Claude Code subscription usage: rate limits, token burn, cost, daily activity and per-model breakdown."
+plugin_api = 26
+tags = ["ai", "development", "indicator", "system", "bar", "desktop", "panel", "service"]
