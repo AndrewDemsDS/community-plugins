@@ -2224,3 +2224,16 @@ icon = "printer"
 description = "CUPS printers and print queue in the bar: job count, faults, cancel jobs, set the default printer."
 plugin_api = 24
 tags = ["bar", "panel", "service", "shortcut", "hardware", "system", "utility"]
+
+[[plugin]]
+id = "dpvpro/sing-box-status"
+name = "Sing-Box Status"
+version = "1.1.0"
+updated_at = 1788711076
+added_at = 1788711076
+author = "dpvpro"
+license = "MIT"
+icon = "link"
+description = "Bar widget showing whether the sing-box proxy daemon is running."
+plugin_api = 3
+tags = ["bar", "network"]
