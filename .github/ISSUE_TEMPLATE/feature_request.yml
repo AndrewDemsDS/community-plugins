@@ -50,6 +50,7 @@ body:
         - cat
         - cider
         - claude-companion
+        - claudecode
         - cmd-runner
         - codexbar-meter
         - color_picker
