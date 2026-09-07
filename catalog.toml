@@ -2299,8 +2299,8 @@ tags = ["ai", "development", "indicator", "system", "bar", "desktop", "panel", "
 [[plugin]]
 id = "ahmedhossamdev/sticky-notes"
 name = "Sticky Notes"
-version = "1.1.0"
-updated_at = 1788740022
+version = "1.1.1"
+updated_at = 1788751382
 added_at = 1788740022
 author = "ahmedhossamdev"
 license = "MIT"
