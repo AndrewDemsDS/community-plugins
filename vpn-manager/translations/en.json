@@ -72,6 +72,12 @@
     "import_failed": "Import failed",
     "dismiss": "Dismiss"
   },
+  "launcher": {
+    "open_title": "Open VPN Manager",
+    "open_subtitle": "Manage VPN connections",
+    "connect_title": "Connect to {name}",
+    "disconnect_title": "Disconnect {name}"
+  },
   "notifications": {
     "connected_untrusted": "Untrusted network detected - connected {name}.",
     "connect_failed": "VPN connect failed",

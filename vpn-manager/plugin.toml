@@ -12,7 +12,7 @@ author       = "andrewdems"
 license      = "MIT"
 icon         = "shield-lock"
 description  = "Connect, disconnect and import NetworkManager VPNs of any protocol, with auto-connect off trusted networks."
-tags         = ["bar", "panel", "service", "shortcut", "network", "privacy", "indicator"]
+tags         = ["bar", "launcher", "panel", "service", "shortcut", "network", "privacy", "indicator"]
 dependencies = ["nmcli", "nm-connection-editor", "nmtui-edit", "kdialog", "zenity"]
 
 [[setting]]
@@ -81,3 +81,11 @@ open_near_click = true
 [[shortcut]]
 id = "toggle"
 entry = "shortcut.luau"
+
+[[launcher_provider]]
+id                       = "provider"
+entry                    = "launcher.luau"
+prefix                   = "vpn"
+glyph                    = "shield-lock"
+include_in_global_search = false
+debounce_ms              = 100

@@ -9,7 +9,8 @@ bar widget and panel, the same way `nm-applet`/`nmtui` do.
 | Field | Value |
 | --- | --- |
 | ID | `andrewdems/vpn-manager` |
-| Entries | Service: `service`; bar widget: `bar`; panel: `panel`; shortcut: `toggle` |
+| Entries | Service: `service`; bar widget: `bar`; panel: `panel`; shortcut: `toggle`; launcher: `provider` |
+| Launcher Prefix | `/vpn` |
 
 ## Requirements
 
@@ -86,6 +87,9 @@ Open or close the panel with:
 ```sh
 noctalia msg panel-toggle andrewdems/vpn-manager:panel
 ```
+
+Typing `/vpn` in the launcher offers "Open VPN Manager" plus a
+connect/disconnect entry for every configured connection.
 
 ## Auto-connect on untrusted networks
 
