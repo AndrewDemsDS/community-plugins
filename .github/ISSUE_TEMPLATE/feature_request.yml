@@ -1,0 +1,264 @@
+name: Feature Request
+description: Suggest an improvement to a community plugin
+title: "[FEATURE] "
+labels: ["feature"]
+type: "Feature"
+
+body:
+  - type: checkboxes
+    id: submission-checklist
+    attributes:
+      label: Submission checklist
+      description: Please confirm the following before submitting.
+      options:
+        - label: I have searched existing issues and confirmed this has not been requested before.
+          required: true
+        - label: I have checked existing pull requests for similar changes.
+          required: true
+        - label: This is about a community plugin, not about Noctalia itself (those belong in the noctalia repo).
+          required: true
+
+  - type: dropdown
+    id: plugin-id
+    attributes:
+      label: Plugin
+      description: The plugin id.
+      default: 0
+      options:
+        - --- SELECT ---
+        - 9router-control
+        - ai-usagebar
+        - airpods
+        - ambient-sounds
+        - anilist
+        - arch-updater
+        - asus-fan
+        - asus-fans-controller-ec
+        - audio-switcher
+        - awwwall
+        - ayet-kosesi
+        - battery-graph
+        - battery-power-management
+        - battery-threshold
+        - battery-widget
+        - bazaarsearch
+        - better-clock
+        - bitdjinn
+        - bookmarks
+        - calculator
+        - case-convert
+        - cat
+        - cider
+        - claude-companion
+        - claudecode
+        - cmd-runner
+        - codexbar-meter
+        - color_picker
+        - config-swap
+        - crashes
+        - custom-shortcut
+        - daily-wallpaper
+        - deepseek_usage
+        - desktop-launcher
+        - discord-voice
+        - dns-switcher
+        - drive-health
+        - dropwall
+        - ds4-color
+        - emoji-picker
+        - eyecare
+        - file-search
+        - game-launcher
+        - gamer-mode
+        - git_companion
+        - github-activity
+        - github-prs
+        - gocryptfs
+        - godot-provider
+        - gslapper
+        - hassio
+        - hotspot
+        - hypr-layout-switcher
+        - hypr-screen-mirror
+        - hypr-submap
+        - hyprland-visual-editor
+        - ideapad-conservation-mode
+        - iio_lock
+        - imagemagick-clock
+        - inventory-manager
+        - ip-monitor
+        - jetbrains-provider
+        - k8s-status
+        - keybind-cheatsheet
+        - keymap
+        - keyviz
+        - kineticwe-layouts
+        - launcher-pass
+        - layout-fix
+        - librelinkup
+        - lid-guard
+        - link-ip-monitor
+        - llamanager
+        - lrc
+        - lyrics
+        - mango_layouts
+        - mangowm-keymode
+        - mawaqit
+        - media-lyrics
+        - mihomo-control
+        - mimir
+        - mini-docker
+        - network-toolkit
+        - nextboot-selector
+        - niri-active-workspace
+        - niri-animations
+        - niri-displays
+        - niri-rules-studio
+        - nix-monitor
+        - noctwhspr
+        - nvim-projects
+        - nvtop
+        - obs-integration
+        - obsidian
+        - ocr
+        - omniroute-quota
+        - omp-launcher
+        - opencode-companion
+        - opencodex-bar
+        - opnsense
+        - oppo-pods
+        - palette-creator
+        - pass
+        - phone-connect
+        - phone-operate
+        - pomodoro
+        - portctl
+        - printers
+        - prismlauncher-instances
+        - procmon
+        - proton-pass
+        - pulsar-mouse
+        - qrcode
+        - quranwidget
+        - remmina
+        - rss-notifier
+        - ruh-vpn
+        - run-path
+        - screen-toolkit
+        - sharednd
+        - shell-command
+        - shelly
+        - sing-box-status
+        - special-workspaces
+        - spotify
+        - spotify-lyrics
+        - spotify-media
+        - ssh-launcher
+        - sticky-notes
+        - super-productivity
+        - syncthing
+        - system-monitor
+        - system-updater
+        - systempulse
+        - tailnet
+        - tailscale
+        - thinkpad-fan
+        - thinkpad-led
+        - thunderbird-companion
+        - tmux-provider
+        - todo
+        - topgrade-wrapper
+        - udiskie
+        - um5606_fan_state
+        - upbeat
+        - vidi
+        - voxtype
+        - w-engine
+        - wallpaper-switcher
+        - warp
+        - web-launcher
+        - web-search
+        - webapp-maker
+        - wireview-pro-ii
+        - wl-screen-mirror
+        - youtube-search
+        - yt-music
+        - zed-provider
+
+    validations:
+      required: true
+
+
+  - type: dropdown
+    id: feature-type
+    attributes:
+      label: Feature type
+      description: What kind of feature or improvement is this?
+      options:
+        - UI / visual improvement
+        - New functionality
+        - Performance improvement
+        - Configuration / customization
+        - Accessibility improvement
+        - Integration support
+        - Documentation improvement
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature summary
+      description: A concise description of the feature or enhancement.
+      placeholder: What would you like to see added or changed?
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation / use case
+      description: |
+        Why would this feature be useful?
+        What problem does it solve or improve?
+      placeholder: Explain the benefit or real-world use case...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: |
+        Describe how you think this could work.
+
+        Mockups, examples, screenshots, or references are welcome.
+      placeholder: Describe your idea...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: |
+        Have you considered any alternative solutions or workarounds?
+      placeholder: Optional...
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References / related projects
+      description: |
+        Link any related projects, concepts, screenshots, issues, or examples here.
+      placeholder: |
+        https://github.com/...
+        https://example.com/...
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: |
+        Add any additional information, screenshots, mockups, or context here.
