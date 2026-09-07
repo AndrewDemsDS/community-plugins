@@ -154,6 +154,7 @@ body:
         - spotify-lyrics
         - spotify-media
         - ssh-launcher
+        - sticky-notes
         - super-productivity
         - syncthing
         - system-monitor
