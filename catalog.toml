@@ -2295,3 +2295,16 @@ icon = "robot"
 description = "Claude Code subscription usage: rate limits, token burn, cost, daily activity and per-model breakdown."
 plugin_api = 26
 tags = ["ai", "development", "indicator", "system", "bar", "desktop", "panel", "service"]
+
+[[plugin]]
+id = "ahmedhossamdev/sticky-notes"
+name = "Sticky Notes"
+version = "1.1.0"
+updated_at = 1788740022
+added_at = 1788740022
+author = "ahmedhossamdev"
+license = "MIT"
+icon = "note"
+description = "Colorful sticky notes and interactive checklists from your bar, with pinning, privacy blur, and portable storage."
+plugin_api = 24
+tags = ["bar", "panel", "service", "privacy", "productivity", "utility"]
